@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#4338ca" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Back on Track" />
+  <meta name="description" content="OJT Daily Time Record — Back on Track" />
+  <title>Back on Track</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ───────────────── AUTH SCREEN ───────────────── -->
+<div id="auth-screen" class="screen active">
+  <div class="auth-container">
+    <div class="auth-brand">
+      <div class="auth-logo">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="10" fill="#4338ca"/>
+          <path d="M10 22 L14 14 L18 20 L22 12 L26 18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="26" cy="18" r="2" fill="#a5b4fc"/>
+        </svg>
+      </div>
+      <h1 class="auth-title">Back on Track</h1>
+      <p class="auth-subtitle">Your OJT Daily Time Record</p>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="signin">Sign In</button>
+        <button class="auth-tab" data-tab="signup">Sign Up</button>
+      </div>
+      <div id="signin-form" class="auth-form active">
+        <div class="field-group">
+          <label class="field-label">Username</label>
+          <input type="text" id="signin-username" class="field-input" placeholder="your username" autocomplete="username" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="signin-password" class="field-input" placeholder="••••••••" autocomplete="current-password" />
+            <button class="eye-btn" onclick="togglePass('signin-password',this)">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="signin-error" class="auth-error hidden"></div>
+        <button class="btn-primary full" onclick="handleSignIn()">Sign In</button>
+      </div>
+      <div id="signup-form" class="auth-form">
+        <div class="field-group">
+          <label class="field-label">Username</label>
+          <input type="text" id="signup-username" class="field-input" placeholder="choose a username" autocomplete="username" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="signup-password" class="field-input" placeholder="••••••••" autocomplete="new-password" />
+            <button class="eye-btn" onclick="togglePass('signup-password',this)">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Confirm Password</label>
+          <div class="password-wrap">
+            <input type="password" id="signup-confirm" class="field-input" placeholder="••••••••" autocomplete="new-password" />
+            <button class="eye-btn" onclick="togglePass('signup-confirm',this)">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="signup-error" class="auth-error hidden"></div>
+        <button class="btn-primary full" onclick="handleSignUp()">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── ONBOARDING ───────────────── -->
+<div id="onboarding-screen" class="screen">
+  <div class="onboarding-container">
+    <div class="onboarding-header">
+      <div class="auth-logo" style="margin:0 auto 12px;">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="10" fill="#4338ca"/>
+          <path d="M10 22 L14 14 L18 20 L22 12 L26 18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="26" cy="18" r="2" fill="#a5b4fc"/>
+        </svg>
+      </div>
+      <h2>Set Up Your Profile</h2>
+      <p>Just a few details to get started</p>
+    </div>
+    <div class="onboarding-card">
+      <div class="section-label">Personal Info</div>
+      <div class="field-group">
+        <label class="field-label">Full Name</label>
+        <input type="text" id="ob-name" class="field-input" placeholder="e.g. Juan Dela Cruz" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Course / Program</label>
+        <input type="text" id="ob-course" class="field-input" placeholder="e.g. BS Information Technology" />
+      </div>
+      <div class="section-label" style="margin-top:20px;">OJT Details</div>
+      <div class="field-group">
+        <label class="field-label">Company Name</label>
+        <input type="text" id="ob-company" class="field-input" placeholder="e.g. Acme Corp." />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Company Address</label>
+        <input type="text" id="ob-address" class="field-input" placeholder="e.g. Cebu City, Philippines" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Supervisor Name</label>
+        <input type="text" id="ob-supervisor" class="field-input" placeholder="e.g. Maria Santos" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Total Required Hours</label>
+        <input type="number" id="ob-hours" class="field-input" placeholder="e.g. 486" min="1" />
+      </div>
+      <div id="ob-error" class="auth-error hidden"></div>
+      <button class="btn-primary full" style="margin-top:8px;" onclick="handleOnboarding()">Let's Go →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── MAIN APP ───────────────── -->
+<div id="app-screen" class="screen">
+
+  <header class="app-header">
+    <div class="header-left">
+      <div class="header-logo">
+        <svg width="22" height="22" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="10" fill="#4338ca"/>
+          <path d="M10 22 L14 14 L18 20 L22 12 L26 18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="26" cy="18" r="2" fill="#a5b4fc"/>
+        </svg>
+      </div>
+      <span class="header-title">Back on Track</span>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" onclick="openProfileModal()" title="Profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="offline-banner" class="offline-banner hidden"></div>
+
+  <main class="app-main">
+
+    <!-- Dashboard -->
+    <section class="dashboard-card">
+      <div class="dash-top">
+        <div class="dash-info">
+          <p class="dash-name" id="dash-name">—</p>
+          <p class="dash-company" id="dash-company">—</p>
+        </div>
+        <div class="progress-toggle-wrap">
+          <select class="progress-select" onchange="updateProgressBar(this.value)" id="progress-select">
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+            <option value="percent">Percent</option>
+          </select>
+        </div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-labels">
+          <span id="progress-label-left">0 hrs done</span>
+          <span id="progress-label-right">0 hrs left</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-meta">
+          <span id="progress-pct">0%</span>
+          <span id="progress-required">of 0 hrs required</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Calendar -->
+    <div class="calendar-card">
+      <div class="calendar-header">
+        <button class="cal-nav-btn" onclick="calPrev()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="cal-month-label" id="cal-month-label"></span>
+        <button class="cal-nav-btn" onclick="calNext()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="cal-weekdays">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-legend">
+        <span class="cal-legend-dot present"></span><span>Present</span>
+        <span class="cal-legend-dot absent" style="margin-left:12px;"></span><span>Absent</span>
+      </div>
+    </div>
+
+    <!-- Entries -->
+    <div class="entries-header">
+      <h2 class="entries-title">DTR Entries</h2>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="search-input" class="search-input" placeholder="Search entries…" oninput="renderEntries()" />
+      </div>
+    </div>
+
+    <div id="entries-list" class="entries-list"></div>
+
+  </main>
+
+  <button class="fab" onclick="openAddModal()" title="Add DTR Entry">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+
+</div>
+
+<!-- ───────────────── ADD/EDIT MODAL ───────────────── -->
+<div id="entry-modal" class="modal-overlay hidden" onclick="closeModalOutside(event)">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 id="modal-title">Add DTR Entry</h3>
+      <button class="modal-close" onclick="closeEntryModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Status toggle -->
+      <div class="field-group">
+        <label class="field-label">Status</label>
+        <div class="status-toggle" id="status-toggle">
+          <button class="status-btn active" data-status="present" onclick="setStatus('present')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Present
+          </button>
+          <button class="status-btn" data-status="absent" onclick="setStatus('absent')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Absent
+          </button>
+        </div>
+      </div>
+
+      <!-- Present-only fields -->
+      <div id="present-fields">
+        <div class="modal-row">
+          <div class="field-group">
+            <label class="field-label">Day #</label>
+            <input type="number" id="entry-day" class="field-input" placeholder="Auto" min="1" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Date</label>
+            <input type="date" id="entry-date" class="field-input" />
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Hours Worked</label>
+          <input type="number" id="entry-hours" class="field-input" placeholder="e.g. 8" min="0.5" max="24" step="0.5" />
+        </div>
+      </div>
+
+      <!-- Absent-only date (hidden when present) -->
+      <div id="absent-date-field" class="field-group hidden">
+        <label class="field-label">Date</label>
+        <input type="date" id="entry-absent-date" class="field-input" />
+      </div>
+
+      <!-- Details — always shown -->
+      <div class="field-group">
+        <label class="field-label" id="details-label">Work Details</label>
+        <textarea id="entry-details" class="field-input field-textarea" placeholder="What did you do today?"></textarea>
+      </div>
+
+      <input type="hidden" id="entry-edit-id" />
+      <div id="modal-error" class="auth-error hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeEntryModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEntry()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── VIEW DETAILS MODAL ───────────────── -->
+<div id="view-modal" class="modal-overlay hidden" onclick="closeViewOutside(event)">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <div>
+        <h3 id="view-modal-title">Day Details</h3>
+        <p id="view-modal-date" style="font-size:0.8rem;color:var(--text-secondary);margin-top:2px;"></p>
+      </div>
+      <button class="modal-close" onclick="closeViewModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="view-modal-status-badge"></div>
+      <div id="view-modal-hours" style="margin-top:10px;"></div>
+      <div class="field-group" style="margin-top:12px;">
+        <label class="field-label" id="view-details-label">Details</label>
+        <p id="view-modal-details" style="font-size:0.9rem;line-height:1.6;color:var(--text-primary);white-space:pre-wrap;"></p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary full" onclick="closeViewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── CALENDAR DAY MODAL ───────────────── -->
+<div id="cal-modal" class="modal-overlay hidden" onclick="closeCalModalOutside(event)">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <div>
+        <h3 id="cal-modal-title">—</h3>
+        <p id="cal-modal-date" style="font-size:0.8rem;color:var(--text-secondary);margin-top:2px;"></p>
+      </div>
+      <button class="modal-close" onclick="closeCalModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="cal-modal-body"></div>
+    <div class="modal-footer" id="cal-modal-footer">
+      <button class="btn-primary full" onclick="closeCalModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── PROFILE MODAL ───────────────── -->
+<div id="profile-modal" class="modal-overlay hidden" onclick="closeProfileOutside(event)">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>Profile</h3>
+      <button class="modal-close" onclick="closeProfileModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group"><label class="field-label">Full Name</label><input type="text" id="prof-name" class="field-input" /></div>
+      <div class="field-group"><label class="field-label">Course / Program</label><input type="text" id="prof-course" class="field-input" /></div>
+      <div class="field-group"><label class="field-label">Company Name</label><input type="text" id="prof-company" class="field-input" /></div>
+      <div class="field-group"><label class="field-label">Company Address</label><input type="text" id="prof-address" class="field-input" /></div>
+      <div class="field-group"><label class="field-label">Supervisor Name</label><input type="text" id="prof-supervisor" class="field-input" /></div>
+      <div class="field-group"><label class="field-label">Total Required Hours</label><input type="number" id="prof-hours" class="field-input" min="1" /></div>
+    </div>
+    <div class="modal-footer" style="flex-direction:column;gap:8px;">
+      <button class="btn-primary full" onclick="saveProfile()">Save Changes</button>
+      <button class="btn-danger full" onclick="confirmSignOut()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── DELETE MODAL ───────────────── -->
+<div id="delete-modal" class="modal-overlay hidden" onclick="closeDeleteOutside(event)">
+  <div class="modal-card modal-sm">
+    <div class="modal-header"><h3>Delete Entry?</h3></div>
+    <div class="modal-body">
+      <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.5;">This will permanently remove this DTR entry. This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+<script src="app.js"></script>
+</body>
+</html>
