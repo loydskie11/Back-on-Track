@@ -9,8 +9,8 @@
    ─────────────────────────────────────────────────────────────
    Leave SUPABASE_URL as '' to use localStorage only.
    ─────────────────────────────────────────────────────────────*/
-const SUPABASE_URL      = '';  // e.g. 'https://xyzabc.supabase.co'
-const SUPABASE_ANON_KEY = '';  // e.g. 'eyJhbGciOi...'
+const SUPABASE_URL      = 'https://nfskfueotzxdrxqnbwib.supabase.co';  // e.g. 'https://xyzabc.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mc2tmdWVvdHp4ZHJ4cW5id2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwOTU4MjksImV4cCI6MjA5NzY3MTgyOX0.VJ9Gb5i3FQaL3Q1tR_2_O83HQqX7DkI528MCzgREC7o';  // e.g. 'eyJhbGciOi...'
 const USE_SUPABASE = SUPABASE_URL !== '' && SUPABASE_ANON_KEY !== '';
 
 /* ════ OFFLINE QUEUE ════════════════════════════════════════ */
@@ -243,17 +243,38 @@ async function loadUserData() {
         sbFetch(`bot_profiles?user_id=eq.${currentUser.id}&select=*`),
         sbFetch(`bot_entries?user_id=eq.${currentUser.id}&select=*&order=day_number.asc`)
       ]);
+      
       profile = profs.length ? { name: profs[0].name, course: profs[0].course, company: profs[0].company, address: profs[0].address, supervisor: profs[0].supervisor, requiredHours: profs[0].required_hours } : null;
+      
+      // FIX: If Supabase doesn't have the profile yet (e.g., pending sync), recover it from local storage
+      if (!profile) {
+        const localP = localStorage.getItem(LS.profile(currentUser.id));
+        if (localP) profile = JSON.parse(localP);
+      }
+
       entries = ents.map(e => ({ id: e.id, status: e.status || 'present', dayNumber: e.day_number, date: e.date, hours: e.hours || 0, details: e.details || '' }));
+      
+      // FIX: Also recover entries from local storage if Supabase returned empty
+      if (entries.length === 0) {
+        const localE = localStorage.getItem(LS.entries(currentUser.id));
+        if (localE) entries = JSON.parse(localE);
+      }
+
       if (profile) localStorage.setItem(LS.profile(currentUser.id), JSON.stringify(profile));
       localStorage.setItem(LS.entries(currentUser.id), JSON.stringify(entries));
+      
+      // Ensure status field exists on old entries
+      entries = entries.map(en => ({ status: 'present', ...en }));
       return;
-    } catch { /* fall through */ }
+    } catch { /* fall through to local storage if fetch fails completely */ }
   }
+  
+  // Local fallback (Offline mode)
   const p = localStorage.getItem(LS.profile(currentUser.id));
   profile  = p ? JSON.parse(p) : null;
   const e  = localStorage.getItem(LS.entries(currentUser.id));
   entries  = e ? JSON.parse(e) : [];
+  
   // Ensure status field exists on old entries
   entries = entries.map(en => ({ status: 'present', ...en }));
 }
