@@ -77,6 +77,27 @@ Save `app.js`. That's it — the app will now use Supabase.
 
 ---
 
+## 🌐 Hosting (Free Options)
+
+For PWA install + multi-device access, host the files online:
+
+### Netlify Drop (Easiest — no account needed):
+1. Go to [https://app.netlify.com/drop](https://app.netlify.com/drop)
+2. Drag the entire `back-on-track` folder onto the page
+3. You get a free URL instantly (e.g. `https://amazing-sky-123.netlify.app`)
+
+### GitHub Pages:
+1. Push the files to a GitHub repo
+2. Go to Settings → Pages → Deploy from branch → main
+3. Your site is at `https://yourusername.github.io/repo-name`
+
+### Vercel:
+1. Install Vercel CLI: `npm i -g vercel`
+2. Run `vercel` in the project folder
+3. Follow the prompts
+
+---
+
 ## 📁 File Structure
 
 ```
