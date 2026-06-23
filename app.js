@@ -245,6 +245,19 @@ async function handleOnboarding() {
   showScreen('app-screen'); initCalendar(); renderDashboard(); renderCalendar(); renderEntries(); updateOfflineBanner();
 }
 
+/* ════ CANCEL ONBOARDING ════════════════════════════════════ */
+function cancelOnboarding() {
+  // Clear the active session and return to the auth screen
+  currentUser = null;
+  profile = null;
+  entries = [];
+  localStorage.removeItem(LS.session);
+  showScreen('auth-screen');
+  
+  // Switch the view back to the Sign In tab by default
+  document.querySelector('.auth-tab[data-tab="signin"]').click();
+}
+
 /* ════ LOAD / SAVE DATA ══════════════════════════════════════ */
 async function loadUserData() {
   if (USE_SUPABASE && navigator.onLine) {
@@ -499,14 +512,17 @@ function renderEntries() {
     const detailFull = e.details || '';
     const truncated  = detailFull.length > MAX_CHARS;
     const detailShow = truncated ? detailFull.slice(0, MAX_CHARS) + '…' : detailFull;
+    
+    // Removed the onclick from here since the parent card will handle it
     const moreHint   = truncated
-      ? `<span class="entry-details-hint" onclick="openViewModal('${e.id}')">Read more</span>` : '';
+      ? `<span class="entry-details-hint">Read more</span>` : '';
 
     // Pending dot
     const isPending = USE_SUPABASE && getQueue().some(op =>
       (op.type === 'add' || op.type === 'edit') && op.payload?.id === e.id);
 
-    return `<div class="entry-card${isAbs ? ' absent-card' : ''}" id="card-${e.id}">
+    // Added onclick and cursor:pointer to the main card
+    return `<div class="entry-card${isAbs ? ' absent-card' : ''}" id="card-${e.id}" onclick="openViewModal('${e.id}')" style="cursor: pointer;">
       <div class="entry-day-badge">
         <span class="entry-day-num">${dayNum}</span>
         <span class="entry-day-label">Day</span>
@@ -516,20 +532,20 @@ function renderEntries() {
           <span class="entry-date">${fmt}${isPending ? ' <span class="pending-dot" title="Pending sync">●</span>' : ''}</span>
           ${badge}
         </div>
-        <p class="entry-details" onclick="openViewModal('${e.id}')">${escHtml(detailShow)}</p>
+        <p class="entry-details">${escHtml(detailShow)}</p>
         ${moreHint}
       </div>
       <div class="entry-actions">
-        <button class="entry-icon-btn edit" onclick="openEditModal('${e.id}')" title="Edit">
+        <button class="entry-icon-btn edit" onclick="event.stopPropagation(); openEditModal('${e.id}')" title="Edit">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
           </svg>
         </button>
-        <button class="entry-icon-btn del" onclick="openDeleteModal('${e.id}')" title="Delete">
+        <button class="entry-icon-btn del" onclick="event.stopPropagation(); openDeleteModal('${e.id}')" title="Delete">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-            <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1-1v2"/>
           </svg>
         </button>
       </div>
