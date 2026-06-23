@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('entry-absent-date').valueAsDate = new Date();
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  initReminderChecker();
 });
 
 function showScreen(id) {
@@ -725,7 +726,7 @@ function openProfileModal() {
   document.getElementById('prof-supervisor').value = profile.supervisor;
   document.getElementById('prof-hours').value      = profile.requiredHours;
   
-  // Set custom theme dropdown state
+  // Set custom theme
   const savedT = localStorage.getItem('bot_theme') || 'default';
   document.getElementById('prof-theme').value = savedT;
   const labels = {
@@ -734,6 +735,13 @@ function openProfileModal() {
     'high-contrast': 'Professional High-Contrast'
   };
   document.getElementById('theme-label').textContent = labels[savedT] || 'Indigo (Default)';
+
+  // Set Reminder Settings
+  const settings = JSON.parse(localStorage.getItem(`bot_settings_${currentUser.id}`) || '{}');
+  const isEnabled = settings.reminderEnabled || false;
+  document.getElementById('prof-reminder-toggle').checked = isEnabled;
+  document.getElementById('prof-reminder-time').value = settings.reminderTime || '17:00';
+  document.getElementById('reminder-time-row').classList.toggle('hidden', !isEnabled);
   
   document.getElementById('profile-modal').classList.remove('hidden');
 }
@@ -751,8 +759,16 @@ async function saveProfile() {
   if (!name || !course || !company || !address || !supervisor || !hrs || hrs < 1) { showToast('Please fill in all fields.'); return; }
   profile = { name, course, company, address, supervisor, requiredHours: hrs };
   
+  // Save Theme
   const selectedTheme = document.getElementById('prof-theme').value;
   applyTheme(selectedTheme);
+
+  // Save Reminder Settings Locally
+  const settings = {
+    reminderEnabled: document.getElementById('prof-reminder-toggle').checked,
+    reminderTime: document.getElementById('prof-reminder-time').value
+  };
+  localStorage.setItem(`bot_settings_${currentUser.id}`, JSON.stringify(settings));
   
   await saveProfile_data();
   closeProfileModal(); renderDashboard();
@@ -871,3 +887,70 @@ document.addEventListener('keydown', e => {
     if (af) { const tab = document.querySelector('.auth-tab.active'); if (tab?.dataset.tab === 'signin') handleSignIn(); else handleSignUp(); }
   }
 });
+
+/* ════ NOTIFICATIONS ══════════════════════════════════════════ */
+function handleReminderToggle(e) {
+  if (e.target.checked) {
+    if (!('Notification' in window)) {
+      showToast('Notifications not supported on this browser.');
+      e.target.checked = false;
+      return;
+    }
+    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+      Notification.requestPermission().then(perm => {
+        if (perm !== 'granted') {
+          e.target.checked = false;
+          showToast('Permission denied.');
+          document.getElementById('reminder-time-row').classList.add('hidden');
+        } else {
+          document.getElementById('reminder-time-row').classList.remove('hidden');
+        }
+      });
+    } else if (Notification.permission === 'denied') {
+      showToast('Notifications blocked in browser settings.');
+      e.target.checked = false;
+    } else {
+      document.getElementById('reminder-time-row').classList.remove('hidden');
+    }
+  } else {
+    document.getElementById('reminder-time-row').classList.add('hidden');
+  }
+}
+
+function initReminderChecker() {
+  setInterval(() => {
+    if (!currentUser) return;
+    const s = localStorage.getItem(`bot_settings_${currentUser.id}`);
+    if (!s) return;
+    const settings = JSON.parse(s);
+    
+    if (settings.reminderEnabled && settings.reminderTime) {
+      const now = new Date();
+      const currentHrs = String(now.getHours()).padStart(2, '0');
+      const currentMins = String(now.getMinutes()).padStart(2, '0');
+      const currentTime = `${currentHrs}:${currentMins}`;
+      
+      if (currentTime === settings.reminderTime) {
+        const lastNotified = localStorage.getItem('bot_last_notified');
+        const today = now.toDateString();
+        // Prevent spamming multiple notifications in the same minute/day
+        if (lastNotified !== today) {
+          if (Notification.permission === 'granted') {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+              navigator.serviceWorker.ready.then(reg => {
+                reg.showNotification('Back on Track', {
+                  body: "Time to log your DTR! Don't forget your hours today.",
+                  icon: 'icons/icon-192.png',
+                  badge: 'icons/icon-192.png'
+                });
+              });
+            } else {
+              new Notification('Back on Track', { body: "Time to log your DTR! Don't forget your hours today." });
+            }
+          }
+          localStorage.setItem('bot_last_notified', today);
+        }
+      }
+    }
+  }, 60000); // Check every 60 seconds
+}

@@ -595,3 +595,32 @@ input[type="date"]{color-scheme:light}
 }
 .custom-select-option:not(:last-child) { border-bottom: 1px solid var(--gray-100); }
 .custom-select-option:hover { background: var(--gray-50); color: var(--primary); }
+
+/* ─── iOS Toggle Switch ──────────────────────────── */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 26px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--gray-300);
+  transition: .3s;
+  border-radius: 26px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px; width: 22px;
+  left: 2px; bottom: 2px;
+  background-color: white;
+  transition: .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + .slider { background-color: var(--primary); }
+.toggle-switch input:checked + .slider:before { transform: translateX(20px); }

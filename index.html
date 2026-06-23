@@ -466,6 +466,30 @@
         </div>
       </div>
 
+      <!-- Group 4: Notifications -->
+      <div class="settings-section-title">Notifications</div>
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <div class="settings-field" style="flex-direction: row; justify-content: space-between; align-items: center;">
+            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary);">Daily Reminder</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="prof-reminder-toggle" onchange="handleReminderToggle(event)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-row hidden" id="reminder-time-row">
+          <div class="settings-icon" style="background:transparent; color:transparent;"></div>
+          <div class="settings-field" style="flex-direction: row; justify-content: space-between; align-items: center;">
+            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary);">Time</label>
+            <input type="time" id="prof-reminder-time" class="settings-input" style="width: auto; text-align: right;" value="17:00" />
+          </div>
+        </div>
+      </div>
+
     </div>
     
     <div class="modal-footer" style="flex-direction:column;gap:8px;">
