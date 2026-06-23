@@ -143,13 +143,15 @@ back-on-track/
 
 **Data & Export:**
 - ✅ **One-Click CSV Export:** Instantly generate and download a formatted DTR journal of all your hours and tasks for school requirements.
-- ✅ **JSON Backup & Restore:** Safeguard your offline data by exporting a JSON backup and restoring it on any device.
+- ✅ **Export DTR Form 48:** Print or save your entries directly into the official Civil Service Form No. 48 format, including side-by-side copies.
+- ✅ **Automated Data Backup & Restore:** Safeguard your offline data by exporting a JSON backup and easily restoring it on any device.
 - ✅ Works fully offline (localStorage fallback with offline queueing)
 - ✅ Optional Supabase cloud synchronization
 
 **UI & Experience:**
+- ✅ **Custom Themes:** Personalize your app with beautiful new color palettes, including Warm Earth and Professional High-Contrast.
 - ✅ **Daily Reminders:** Local push notifications to remind you to log your hours (customizable time).
-- ✅ **Custom Themes:** Choose between Indigo (Default), Warm Earth, or Professional High-Contrast palettes.
+- ✅ **"What's New" Modal:** Dynamic, one-time popup to showcase app updates and patch notes to users.
 - ✅ iOS-inspired "Bento Box" Settings/Profile UI.
 - ✅ Fully clickable entry cards for better mobile accessibility.
 - ✅ Installable as a native-feeling PWA on iOS, Android, and Desktop.
