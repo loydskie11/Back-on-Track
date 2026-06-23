@@ -1309,7 +1309,7 @@ function buildDtrCopyHtml(monthValue) {
   });
 
   let rowsHtml = '';
-  let totalHours = 0;
+  let totalMinutes = 0; // Changed from totalHours to totalMinutes for precision
   
   for (let d = 1; d <= 31; d++) {
     if (d > daysInMonth) {
@@ -1324,7 +1324,33 @@ function buildDtrCopyHtml(monthValue) {
       const amO = ent.amOut ? formatTimePrint(ent.amOut) : '';
       const pmI = ent.pmIn ? formatTimePrint(ent.pmIn) : '';
       const pmO = ent.pmOut ? formatTimePrint(ent.pmOut) : '';
-      totalHours += parseFloat(ent.hours || 0);
+      
+      // Calculate exact minutes directly from timestamps for a perfect total
+      let dailyMins = 0;
+      let hasTimeSlots = false;
+      
+      if (ent.amIn && ent.amOut) {
+        const dIn = new Date(`2000-01-01T${ent.amIn}`);
+        let dOut = new Date(`2000-01-01T${ent.amOut}`);
+        if (dOut < dIn) dOut.setDate(dOut.getDate() + 1);
+        dailyMins += Math.round((dOut - dIn) / 60000);
+        hasTimeSlots = true;
+      }
+      if (ent.pmIn && ent.pmOut) {
+        const dIn = new Date(`2000-01-01T${ent.pmIn}`);
+        let dOut = new Date(`2000-01-01T${ent.pmOut}`);
+        if (dOut < dIn) dOut.setDate(dOut.getDate() + 1);
+        dailyMins += Math.round((dOut - dIn) / 60000);
+        hasTimeSlots = true;
+      }
+      
+      // Fallback: If it's an old legacy entry with no timestamps, convert its decimal hours to minutes
+      if (!hasTimeSlots && ent.hours) {
+        dailyMins += Math.round(parseFloat(ent.hours) * 60);
+      }
+      
+      totalMinutes += dailyMins;
+
       rowsHtml += `<tr><td>${d}</td><td>${amI}</td><td>${amO}</td><td>${pmI}</td><td>${pmO}</td><td></td><td></td></tr>`;
     } else {
       // Empty row
@@ -1332,8 +1358,10 @@ function buildDtrCopyHtml(monthValue) {
     }
   }
 
-  // Format the total calculation line
-  const totalDisplay = `${totalHours % 1 === 0 ? totalHours : totalHours.toFixed(2)} hrs`;
+  // Format the total exact hours and minutes (e.g., "140:15 hrs")
+  const tHours = Math.floor(totalMinutes / 60);
+  const tMins = totalMinutes % 60;
+  const totalDisplay = tMins > 0 ? `${tHours}:${String(tMins).padStart(2, '0')} hrs` : `${tHours} hrs`;
 
   return `
     <div class="dtr-copy">
