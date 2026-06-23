@@ -213,6 +213,56 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);
 .cal-legend-dot.present{background:var(--indigo-500)}
 .cal-legend-dot.absent{background:var(--red-500)}
 
+/* ─── View Tabs ──────────────────────────────────── */
+.view-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.view-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all .18s ease;
+}
+
+.view-tab svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.view-tab:hover {
+  border-color: var(--indigo-300);
+  color: var(--primary);
+  background: var(--indigo-50);
+}
+
+.view-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(67,56,202,.25);
+}
+
+/* ─── View Panels ────────────────────────────────── */
+.view-panel { display: flex; flex-direction: column; gap: 12px; }
+.view-panel.hidden { display: none !important; }
+
+/* remove old entries-title since it's now replaced by tabs */
+.entries-header { display: flex; flex-direction: column; gap: 10px; }
+
 /* ─── Entries Section ────────────────────────────── */
 .entries-header{display:flex;flex-direction:column;gap:10px}
 .entries-title{font-size:1.1rem;font-weight:700;color:var(--text-primary);letter-spacing:-.2px}
