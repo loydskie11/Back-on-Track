@@ -9,8 +9,8 @@
    ─────────────────────────────────────────────────────────────
    Leave SUPABASE_URL as '' to use localStorage only.
    ─────────────────────────────────────────────────────────────*/
-const SUPABASE_URL      = 'https://nfskfueotzxdrxqnbwib.supabase.co';  // e.g. 'https://xyzabc.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mc2tmdWVvdHp4ZHJ4cW5id2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwOTU4MjksImV4cCI6MjA5NzY3MTgyOX0.VJ9Gb5i3FQaL3Q1tR_2_O83HQqX7DkI528MCzgREC7o';  // e.g. 'eyJhbGciOi...'
+const SUPABASE_URL      = '';  // e.g. 'https://xyzabc.supabase.co'
+const SUPABASE_ANON_KEY = '';  // e.g. 'eyJhbGciOi...'
 const USE_SUPABASE = SUPABASE_URL !== '' && SUPABASE_ANON_KEY !== '';
 
 /* ════ OFFLINE QUEUE ════════════════════════════════════════ */
