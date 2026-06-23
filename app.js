@@ -366,20 +366,25 @@ function updateProgressBar(mode) {
   const totalHrs  = profile.requiredHours;
   const presentE  = entries.filter(e => e.status === 'present');
   const doneHrs   = presentE.reduce((s, e) => s + Number(e.hours), 0);
-  const doneFmt   = doneHrs % 1 === 0 ? doneHrs : doneHrs.toFixed(1);
+  
+  // Updated to 2 decimal places
+  const doneFmt   = doneHrs % 1 === 0 ? doneHrs : doneHrs.toFixed(2);
   const pct       = totalHrs > 0 ? Math.min((doneHrs / totalHrs) * 100, 100) : 0;
   const totalDays = presentE.length;
   const estDays   = totalHrs > 0 && doneHrs > 0 ? Math.ceil(totalHrs / (doneHrs / totalDays)) : 0;
+  
   let ll, rl, pl, rql, fp;
   if (mode === 'hours') {
     const left = Math.max(totalHrs - doneHrs, 0);
-    ll = `${doneFmt} hrs done`; rl = `${left % 1 === 0 ? left : left.toFixed(1)} hrs left`;
+    // Updated to 2 decimal places
+    ll = `${doneFmt} hrs done`; rl = `${left % 1 === 0 ? left : left.toFixed(2)} hrs left`;
     pl = `${pct.toFixed(1)}%`; rql = `of ${totalHrs} hrs required`; fp = pct;
   } else if (mode === 'days') {
     ll = `${totalDays} day${totalDays !== 1 ? 's' : ''} logged`;
     rl = estDays > 0 ? `~${Math.max(estDays - totalDays, 0)} days left` : '—';
     pl = `${totalDays} days`;
-    rql = `at avg ${totalDays > 0 ? (doneHrs / totalDays).toFixed(1) : 0} hrs/day`;
+    // Updated to 2 decimal places
+    rql = `at avg ${totalDays > 0 ? (doneHrs / totalDays).toFixed(2) : 0} hrs/day`;
     fp  = estDays > 0 ? Math.min((totalDays / estDays) * 100, 100) : pct;
   } else {
     ll = `${pct.toFixed(1)}% complete`; rl = `${(100 - pct).toFixed(1)}% remaining`;
@@ -534,7 +539,7 @@ function renderEntries() {
     const d      = new Date(e.date + 'T00:00:00');
     const fmt    = d.toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' });
     const isAbs  = e.status === 'absent';
-    const hrs    = Number(e.hours) % 1 === 0 ? Number(e.hours) : Number(e.hours).toFixed(1);
+    const hrs    = Number(e.hours) % 1 === 0 ? Number(e.hours) : Number(e.hours).toFixed(2);
     const badge  = isAbs
       ? `<span class="entry-absent-badge">Absent</span>`
       : `<span class="entry-hours-badge">${hrs} hrs</span>`;
@@ -617,7 +622,7 @@ function openViewModal(id) {
   document.getElementById('view-modal-hours').innerHTML = isAbs ? '' :
     `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
        <span style="font-size:.8rem;font-weight:600;color:var(--text-secondary);">Hours worked:</span>
-       <span class="entry-hours-badge">${Number(e.hours) % 1 === 0 ? Number(e.hours) : Number(e.hours).toFixed(1)} hrs</span>
+       <span class="entry-hours-badge">${Number(e.hours) % 1 === 0 ? Number(e.hours) : Number(e.hours).toFixed(2)} hrs</span>
        ${timeDisplayHtml}
      </div>`;
   document.getElementById('view-details-label').textContent = isAbs ? 'Reason for Absence' : 'Work Details';
@@ -655,6 +660,7 @@ function nextPresentDayNumber() {
 }
 
 /* ════ HOURS CALCULATION ═════════════════════════════════════ */
+/* ════ HOURS CALCULATION ═════════════════════════════════════ */
 function calculateHours() {
   const amIn = document.getElementById('entry-am-in').value;
   const amOut = document.getElementById('entry-am-out').value;
@@ -681,8 +687,11 @@ function calculateHours() {
   
   if (hrs < 0) hrs = 0;
   
+  // Round accurately to 2 decimal places to avoid floating point math errors
+  hrs = Math.round(hrs * 100) / 100;
+  
   document.getElementById('entry-hours').value = hrs;
-  document.getElementById('calculated-hours').textContent = `${hrs % 1 === 0 ? hrs : hrs.toFixed(1)} hrs`;
+  document.getElementById('calculated-hours').textContent = `${hrs % 1 === 0 ? hrs : hrs.toFixed(2)} hrs`;
 }
 
 function openAddModal() {
@@ -728,7 +737,7 @@ function openEditModal(id) {
       calculateHours();
     } else {
       document.getElementById('entry-hours').value = e.hours;
-      document.getElementById('calculated-hours').textContent = `${Number(e.hours) % 1 === 0 ? Number(e.hours) : Number(e.hours).toFixed(1)} hrs (Legacy)`;
+      document.getElementById('calculated-hours').textContent = `${Number(e.hours) % 1 === 0 ? Number(e.hours) : Number(e.hours).toFixed(2)} hrs (Legacy)`;
     }
   }
   document.getElementById('entry-modal').classList.remove('hidden');
@@ -1324,7 +1333,7 @@ function buildDtrCopyHtml(monthValue) {
   }
 
   // Format the total calculation line
-  const totalDisplay = `${totalHours % 1 === 0 ? totalHours : totalHours.toFixed(1)} hrs`;
+  const totalDisplay = `${totalHours % 1 === 0 ? totalHours : totalHours.toFixed(2)} hrs`;
 
   return `
     <div class="dtr-copy">
