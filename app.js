@@ -9,8 +9,8 @@
    ─────────────────────────────────────────────────────────────
    Leave SUPABASE_URL as '' to use localStorage only.
    ─────────────────────────────────────────────────────────────*/
-const SUPABASE_URL      = '';  // e.g. 'https://xyzabc.supabase.co'
-const SUPABASE_ANON_KEY = '';  // e.g. 'eyJhbGciOi...'
+const SUPABASE_URL      = 'https://nfskfueotzxdrxqnbwib.supabase.co';  // e.g. 'https://xyzabc.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mc2tmdWVvdHp4ZHJ4cW5id2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwOTU4MjksImV4cCI6MjA5NzY3MTgyOX0.VJ9Gb5i3FQaL3Q1tR_2_O83HQqX7DkI528MCzgREC7o';  // e.g. 'eyJhbGciOi...'
 const USE_SUPABASE = SUPABASE_URL !== '' && SUPABASE_ANON_KEY !== '';
 
 /* ════ OFFLINE QUEUE ════════════════════════════════════════ */
@@ -42,14 +42,14 @@ async function processQueue() {
         await sbFetch('bot_entries', 'POST', {
           id: p.id, user_id: p.user_id, status: p.status,
           day_number: p.dayNumber, date: p.date, hours: p.hours,
-          time_in: p.timeIn, time_out: p.timeOut, details: p.details
+          am_in: p.amIn, am_out: p.amOut, pm_in: p.pmIn, pm_out: p.pmOut, details: p.details
         });
       } else if (op.type === 'edit') {
         const p = op.payload;
         await sbFetch(`bot_entries?id=eq.${p.id}`, 'PATCH', {
           status: p.status, day_number: p.dayNumber,
           date: p.date, hours: p.hours, 
-          time_in: p.timeIn, time_out: p.timeOut, details: p.details
+          am_in: p.amIn, am_out: p.amOut, pm_in: p.pmIn, pm_out: p.pmOut, details: p.details
         });
       } else if (op.type === 'delete') {
         await sbFetch(`bot_entries?id=eq.${op.payload.id}`, 'DELETE');
@@ -304,7 +304,9 @@ async function loadUserData() {
 
       entries = ents.map(e => ({ 
         id: e.id, status: e.status || 'present', dayNumber: e.day_number, 
-        date: e.date, hours: e.hours || 0, timeIn: e.time_in, timeOut: e.time_out, details: e.details || '' 
+        date: e.date, hours: e.hours || 0, 
+        amIn: e.am_in, amOut: e.am_out, pmIn: e.pm_in, pmOut: e.pm_out, 
+        details: e.details || '' 
       }));
       
       // FIX: Also recover entries from local storage if Supabase returned empty
@@ -605,11 +607,18 @@ function openViewModal(id) {
     ? `<span class="entry-absent-badge" style="background:var(--indigo-50); color:var(--indigo-700); border-color:var(--indigo-100);">${e.timeIn} - ${e.timeOut}</span>` 
     : '';
 
+  let timeDisplays = [];
+  if (!isAbs) {
+    if (e.amIn && e.amOut) timeDisplays.push(`<span class="entry-absent-badge" style="background:var(--indigo-50); color:var(--indigo-700); border-color:var(--indigo-100);">AM: ${e.amIn} - ${e.amOut}</span>`);
+    if (e.pmIn && e.pmOut) timeDisplays.push(`<span class="entry-absent-badge" style="background:var(--indigo-50); color:var(--indigo-700); border-color:var(--indigo-100);">PM: ${e.pmIn} - ${e.pmOut}</span>`);
+  }
+  const timeDisplayHtml = timeDisplays.join(' ');
+
   document.getElementById('view-modal-hours').innerHTML = isAbs ? '' :
-    `<div style="display:flex;align-items:center;gap:8px;">
+    `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
        <span style="font-size:.8rem;font-weight:600;color:var(--text-secondary);">Hours worked:</span>
        <span class="entry-hours-badge">${Number(e.hours) % 1 === 0 ? Number(e.hours) : Number(e.hours).toFixed(1)} hrs</span>
-       ${timeDisplay}
+       ${timeDisplayHtml}
      </div>`;
   document.getElementById('view-details-label').textContent = isAbs ? 'Reason for Absence' : 'Work Details';
   document.getElementById('view-modal-details').textContent = e.details;
@@ -647,23 +656,30 @@ function nextPresentDayNumber() {
 
 /* ════ HOURS CALCULATION ═════════════════════════════════════ */
 function calculateHours() {
-  const tIn = document.getElementById('entry-time-in').value;
-  const tOut = document.getElementById('entry-time-out').value;
+  const amIn = document.getElementById('entry-am-in').value;
+  const amOut = document.getElementById('entry-am-out').value;
+  const pmIn = document.getElementById('entry-pm-in').value;
+  const pmOut = document.getElementById('entry-pm-out').value;
+  
   let hrs = 0;
   
-  if (tIn && tOut) {
-    const dIn = new Date(`2000-01-01T${tIn}`);
-    let dOut = new Date(`2000-01-01T${tOut}`);
-    
-    // Handle overnight shifts (e.g. In at 10 PM, Out at 6 AM)
-    if (dOut < dIn) dOut.setDate(dOut.getDate() + 1);
-    
-    let diff = (dOut - dIn) / 3600000; // convert ms to hours
-    diff -= 1; // Automatic 1-hour deduction for lunch/break
-    
-    if (diff < 0) diff = 0;
-    hrs = diff;
+  // Add Morning Hours
+  if (amIn && amOut) {
+    const dIn = new Date(`2000-01-01T${amIn}`);
+    let dOut = new Date(`2000-01-01T${amOut}`);
+    if (dOut < dIn) dOut.setDate(dOut.getDate() + 1); // handles overnight shifts safely
+    hrs += (dOut - dIn) / 3600000;
   }
+  
+  // Add Afternoon Hours
+  if (pmIn && pmOut) {
+    const dIn = new Date(`2000-01-01T${pmIn}`);
+    let dOut = new Date(`2000-01-01T${pmOut}`);
+    if (dOut < dIn) dOut.setDate(dOut.getDate() + 1);
+    hrs += (dOut - dIn) / 3600000;
+  }
+  
+  if (hrs < 0) hrs = 0;
   
   document.getElementById('entry-hours').value = hrs;
   document.getElementById('calculated-hours').textContent = `${hrs % 1 === 0 ? hrs : hrs.toFixed(1)} hrs`;
@@ -677,9 +693,10 @@ function openAddModal() {
   document.getElementById('entry-date').valueAsDate        = new Date();
   document.getElementById('entry-absent-date').valueAsDate = new Date();
   
-  // Clear times and calculate
-  document.getElementById('entry-time-in').value = '';
-  document.getElementById('entry-time-out').value = '';
+  document.getElementById('entry-am-in').value = '';
+  document.getElementById('entry-am-out').value = '';
+  document.getElementById('entry-pm-in').value = '';
+  document.getElementById('entry-pm-out').value = '';
   calculateHours();
   
   setStatus('present');
@@ -701,11 +718,13 @@ function openEditModal(id) {
     document.getElementById('entry-day').value   = e.dayNumber;
     document.getElementById('entry-date').value  = e.date;
     
-    document.getElementById('entry-time-in').value = e.timeIn || '';
-    document.getElementById('entry-time-out').value = e.timeOut || '';
+    document.getElementById('entry-am-in').value = e.amIn || '';
+    document.getElementById('entry-am-out').value = e.amOut || '';
+    document.getElementById('entry-pm-in').value = e.pmIn || '';
+    document.getElementById('entry-pm-out').value = e.pmOut || '';
     
-    // Check if it's a legacy entry (has hours but no timestamps)
-    if (e.timeIn && e.timeOut) {
+    // Fallback for older legacy entries
+    if (e.amIn || e.amOut || e.pmIn || e.pmOut) {
       calculateHours();
     } else {
       document.getElementById('entry-hours').value = e.hours;
@@ -723,49 +742,52 @@ async function saveEntry() {
   const status  = currentModalStatus;
   const details = document.getElementById('entry-details').value.trim();
 
-  let dayNum = null, date = '', hours = 0, timeIn = null, timeOut = null;
+  let dayNum = null, date = '', hours = 0;
+  let amIn = null, amOut = null, pmIn = null, pmOut = null;
 
   if (status === 'present') {
     dayNum = parseInt(document.getElementById('entry-day').value);
     date   = document.getElementById('entry-date').value;
-    timeIn = document.getElementById('entry-time-in').value;
-    timeOut = document.getElementById('entry-time-out').value;
+    amIn   = document.getElementById('entry-am-in').value;
+    amOut  = document.getElementById('entry-am-out').value;
+    pmIn   = document.getElementById('entry-pm-in').value;
+    pmOut  = document.getElementById('entry-pm-out').value;
     hours  = parseFloat(document.getElementById('entry-hours').value);
     
-    // We only force time in/out if hours is 0 (prevents blocking legacy entries)
-    if (!dayNum || !date || (!timeIn && hours <= 0) || (!timeOut && hours <= 0) || !details) { 
-      showModalError('Please fill in all fields correctly.'); return; 
+    if (!dayNum || !date || hours <= 0 || !details) { 
+      showModalError('Please ensure hours are calculated and details are filled.'); return; 
     }
     if (hours > 24) { showModalError('Hours cannot exceed 24.'); return; }
   } else {
     date = document.getElementById('entry-absent-date').value;
     if (!date || !details) { showModalError('Please fill in the date and reason.'); return; }
-    hours = 0; dayNum = null; timeIn = null; timeOut = null;
   }
+
+  const payload = { status, dayNumber: dayNum, date, hours, amIn, amOut, pmIn, pmOut, details };
 
   if (editId) {
     const idx = entries.findIndex(e => e.id === editId); if (idx === -1) return;
-    const updated = { ...entries[idx], status, dayNumber: dayNum, date, hours, timeIn, timeOut, details };
+    const updated = { ...entries[idx], ...payload };
     if (USE_SUPABASE) {
       if (navigator.onLine) {
-        try { await sbFetch(`bot_entries?id=eq.${editId}`, 'PATCH', { status, day_number: dayNum, date, hours, time_in: timeIn, time_out: timeOut, details }); }
-        catch { enqueue({ type: 'edit', payload: { id: editId, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details } }); }
+        try { await sbFetch(`bot_entries?id=eq.${editId}`, 'PATCH', { status, day_number: dayNum, date, hours, am_in: amIn, am_out: amOut, pm_in: pmIn, pm_out: pmOut, details }); }
+        catch { enqueue({ type: 'edit', payload: { id: editId, ...payload } }); }
       } else {
         const q = getQueue().filter(op => !(op.payload?.id === editId && (op.type === 'edit' || op.type === 'add')));
-        q.push({ type: 'edit', payload: { id: editId, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details }, ts: Date.now() });
+        q.push({ type: 'edit', payload: { id: editId, ...payload }, ts: Date.now() });
         saveQueue(q); updateOfflineBanner();
       }
     }
     entries[idx] = updated;
   } else {
-    const id    = 'e_' + Date.now();
-    const entry = { id, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details };
+    const id = 'e_' + Date.now();
+    const entry = { id, ...payload };
     if (USE_SUPABASE) {
       if (navigator.onLine) {
-        try { await sbFetch('bot_entries', 'POST', { id, user_id: currentUser.id, status, day_number: dayNum, date, hours, time_in: timeIn, time_out: timeOut, details }); }
-        catch { enqueue({ type: 'add', payload: { id, user_id: currentUser.id, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details } }); }
+        try { await sbFetch('bot_entries', 'POST', { id, user_id: currentUser.id, status, day_number: dayNum, date, hours, am_in: amIn, am_out: amOut, pm_in: pmIn, pm_out: pmOut, details }); }
+        catch { enqueue({ type: 'add', payload: { id, user_id: currentUser.id, ...payload } }); }
       } else {
-        enqueue({ type: 'add', payload: { id, user_id: currentUser.id, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details } });
+        enqueue({ type: 'add', payload: { id, user_id: currentUser.id, ...payload } });
         updateOfflineBanner();
       }
     }
@@ -979,7 +1001,7 @@ function exportToCSV() {
   }
   
   // 2. Add Table Columns
-  csvContent += "Date,Day Number,Status,Hours,Work Details\n";
+  csvContent += "Date,Day Number,Status,Hours,AM In,AM Out,PM In,PM Out,Work Details\n";
   
   // 3. Sort entries chronologically
   const sortedEntries = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -991,10 +1013,15 @@ function exportToCSV() {
     const status = e.status === 'absent' ? 'Absent' : 'Present';
     const hours = e.status === 'absent' ? 0 : e.hours;
     
-    // Escape quotes and wrap in quotes to safely handle commas/newlines in text
+    const amI = e.amIn || '';
+    const amO = e.amOut || '';
+    const pmI = e.pmIn || '';
+    const pmO = e.pmOut || '';
+    
+    // Escape quotes
     const details = `"${String(e.details || '').replace(/"/g, '""')}"`;
     
-    csvContent += `${date},${day},${status},${hours},${details}\n`;
+    csvContent += `${date},${day},${status},${hours},${amI},${amO},${pmI},${pmO},${details}\n`;
   });
   
   // 5. Create a Blob and trigger the offline download
