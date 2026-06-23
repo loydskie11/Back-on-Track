@@ -142,6 +142,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateOfflineBanner();
         await processQueue();
         updateOfflineBanner();
+        if (!localStorage.getItem('bot_v3_seen')) {
+          setTimeout(() => showWhatsNewModal(), 500);
+        }
       } else { showScreen('onboarding-screen'); }
     } catch { localStorage.removeItem(LS.session); showScreen('auth-screen'); }
   } else { showScreen('auth-screen'); }
@@ -1453,3 +1456,62 @@ function executeDtrPrint() {
   }, 150);
 }
 
+/* ════ WHAT'S NEW MODAL (DYNAMIC INJECTION) ═══════════════════ */
+function showWhatsNewModal() {
+  const container = document.getElementById('dynamic-modals');
+  
+  // Inject the HTML
+  container.innerHTML = `
+    <div id="whatsnew-modal" class="modal-overlay" onclick="closeWhatsNewOutside(event)">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem; background: var(--indigo-100); padding: 6px; border-radius: 12px;">🎉</span>
+            <h3 style="font-size: 1.2rem;">What's New in v2.0</h3>
+          </div>
+        </div>
+        <div class="modal-body" style="gap: 20px; padding-top: 16px;">
+          <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5;">Welcome to the biggest update for <strong>Back on Track</strong>! Here are the new features we've added based on your feedback:</p>
+          
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+              <div style="flex: 1;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Print DTR (Form 48)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Export your entries into an official Civil Service Form No. 48 format. Print single or side-by-side copies right from the app.</p>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div style="flex: 1;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Precise AM/PM Time Slots</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Log precise Arrival and Departure times for Morning and Afternoon. Calculates exact minutes (e.g. 140:15 hrs) automatically.</p>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
+              <div style="flex: 1;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Custom Themes & Reminders</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Personalize the app with Warm Earth or High-Contrast themes, and set daily offline push notifications so you never forget to log out.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-primary full" onclick="closeWhatsNewModal()">Awesome, let's go!</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function closeWhatsNewModal() {
+  document.getElementById('dynamic-modals').innerHTML = ''; // Clears the modal from the DOM
+  localStorage.setItem('bot_v2_seen', 'true'); // Saves the flag
+}
+
+function closeWhatsNewOutside(e) {
+  if (e.target.classList.contains('modal-overlay')) closeWhatsNewModal();
+}
