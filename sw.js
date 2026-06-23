@@ -1,5 +1,5 @@
 /* ─── Back on Track — Service Worker ─── */
-const CACHE = 'bot-v3';
+const CACHE = 'bot-v2';
 const ASSETS = [
   './',
   './index.html',

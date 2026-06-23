@@ -10,7 +10,7 @@
    Leave SUPABASE_URL as '' to use localStorage only.
    ─────────────────────────────────────────────────────────────*/
 const SUPABASE_URL      = '';  // e.g. 'https://xyzabc.supabase.co'
-const SUPABASE_ANON_KEY = '';  // e.g. 'eyJhbGciOi...'
+const SUPABASE_ANON_KEY = ';  // e.g. 'eyJhbGciOi...'
 const USE_SUPABASE = SUPABASE_URL !== '' && SUPABASE_ANON_KEY !== '';
 
 /* ════ OFFLINE QUEUE ════════════════════════════════════════ */
@@ -1474,29 +1474,61 @@ function showWhatsNewModal() {
           <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5;">Welcome to the biggest update for <strong>Back on Track</strong>! Here are the new features we've added based on your feedback:</p>
           
           <div style="display: flex; flex-direction: column; gap: 18px;">
+            
+            <!-- 1. One-Click CSV Report -->
             <div style="display: flex; gap: 14px; align-items: flex-start;">
-              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
               <div style="flex: 1;">
-                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Print DTR (Form 48)</h4>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Export your entries into an official Civil Service Form No. 48 format. Print single or side-by-side copies right from the app.</p>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">One-Click CSV Report</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Instantly generate and download a formatted journal of all your entries for easy spreadsheet viewing.</p>
               </div>
             </div>
-            
-            <div style="display: flex; gap: 14px; align-items: flex-start;">
-              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-              <div style="flex: 1;">
-                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Precise AM/PM Time Slots</h4>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Log precise Arrival and Departure times for Morning and Afternoon. Calculates exact minutes (e.g. 140:15 hrs) automatically.</p>
-              </div>
-            </div>
-            
+
+            <!-- 2. Custom Themes -->
             <div style="display: flex; gap: 14px; align-items: flex-start;">
               <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
               <div style="flex: 1;">
-                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Custom Themes & Reminders</h4>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Personalize the app with Warm Earth or High-Contrast themes, and set daily offline push notifications so you never forget to log out.</p>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Custom Themes</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Personalize your app with beautiful new color palettes, including Warm Earth and Professional High-Contrast.</p>
               </div>
             </div>
+
+            <!-- 3. Push Notifications/Daily Reminder -->
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+              <div style="flex: 1;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Daily Reminders</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Set custom offline push notifications so you never forget to log your daily hours again.</p>
+              </div>
+            </div>
+
+            <!-- 4. Automated Data Backup & Restore -->
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+              <div style="flex: 1;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Automated Data Backup & Restore</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Safeguard your offline data by exporting a JSON backup and easily restoring it on any device.</p>
+              </div>
+            </div>
+
+            <!-- 5. 4-Slot Time In and Out Format -->
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div style="flex: 1;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">4-Slot Time In/Out</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Log exact Arrival and Departure times for Morning and Afternoon with automatic minute-level accuracy.</p>
+              </div>
+            </div>
+
+            <!-- 6. DTR Form 48 Print/Save PDF -->
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div class="settings-icon" style="background: var(--indigo-50); color: var(--indigo-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><polyline points="6 14 12 20 18 14"/><line x1="12" y1="20" x2="12" y2="4"/></svg></div>
+              <div style="flex: 1;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Export DTR Form 48</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Print or save your entries directly into the official Civil Service Form No. 48 format, including side-by-side copies.</p>
+              </div>
+            </div>
+            
           </div>
         </div>
         <div class="modal-footer">
@@ -1506,7 +1538,6 @@ function showWhatsNewModal() {
     </div>
   `;
 }
-
 function closeWhatsNewModal() {
   document.getElementById('dynamic-modals').innerHTML = ''; // Clears the modal from the DOM
   localStorage.setItem('bot_v2_seen', 'true'); // Saves the flag
