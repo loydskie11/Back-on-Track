@@ -865,6 +865,66 @@ document.addEventListener('click', () => {
   }
 });
 
+/* ════ CSV EXPORT ═════════════════════════════════════════════ */
+function exportToCSV() {
+  if (!entries.length) {
+    showToast('No entries to export.');
+    return;
+  }
+  
+  let csvContent = "";
+  
+  // 1. Add Profile Summary Header
+  if (profile) {
+    csvContent += `Name,${profile.name}\n`;
+    csvContent += `Course,${profile.course}\n`;
+    csvContent += `Company,${profile.company}\n`;
+    csvContent += `Supervisor,${profile.supervisor}\n`;
+    
+    // Calculate total completed hours
+    const presentE = entries.filter(e => e.status === 'present');
+    const doneHrs = presentE.reduce((s, e) => s + Number(e.hours), 0);
+    csvContent += `Total Hours Done,${doneHrs} / ${profile.requiredHours}\n\n`;
+  }
+  
+  // 2. Add Table Columns
+  csvContent += "Date,Day Number,Status,Hours,Work Details\n";
+  
+  // 3. Sort entries chronologically
+  const sortedEntries = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  // 4. Map entries to CSV rows
+  sortedEntries.forEach(e => {
+    const date = e.date;
+    const day = e.status === 'absent' ? 'N/A' : e.dayNumber;
+    const status = e.status === 'absent' ? 'Absent' : 'Present';
+    const hours = e.status === 'absent' ? 0 : e.hours;
+    
+    // Escape quotes and wrap in quotes to safely handle commas/newlines in text
+    const details = `"${String(e.details || '').replace(/"/g, '""')}"`;
+    
+    csvContent += `${date},${day},${status},${hours},${details}\n`;
+  });
+  
+  // 5. Create a Blob and trigger the offline download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  
+  link.setAttribute("href", url);
+  
+  // Create a clean filename
+  const userName = profile && profile.name ? profile.name.replace(/\s+/g, '_') : 'OJT';
+  link.setAttribute("download", `DTR_Journal_${userName}.csv`);
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url); // Clean up memory
+  
+  showToast('Exported to CSV ✓');
+}
+
 /* ════ UTILITIES ══════════════════════════════════════════════ */
 function showToast(msg) {
   const t = document.getElementById('toast');

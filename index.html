@@ -212,14 +212,19 @@
 
     <!-- Entries Panel -->
     <div id="panel-entries" class="view-panel">
-      <div class="entries-header">
-        <div class="search-wrap">
+      <!-- Updated to flex-row so the search bar and export button sit side-by-side -->
+      <div class="entries-header" style="flex-direction: row; align-items: center;">
+        <div class="search-wrap" style="flex: 1;">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           <input type="text" id="search-input" class="search-input" placeholder="Search entries…" oninput="handleSearch()" />
           <button class="search-clear-btn hidden" id="search-clear" onclick="clearSearch()" title="Clear search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
+        <!-- New CSV Export Button -->
+        <button class="icon-btn" onclick="exportToCSV()" title="Export as CSV" style="border-radius: var(--radius-md); width: 44px; height: 44px; flex-shrink: 0; background: var(--surface);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
       </div>
       <div id="entries-list" class="entries-list"></div>
     </div>
