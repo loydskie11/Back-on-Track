@@ -204,26 +204,51 @@ async function handleSignUp() {
   const username = document.getElementById('signup-username').value.trim();
   const password = document.getElementById('signup-password').value;
   const confirm  = document.getElementById('signup-confirm').value;
+  
   if (!username || !password || !confirm) { showAuthError('signup-error', 'Please fill in all fields.'); return; }
   if (username.length < 3) { showAuthError('signup-error', 'Username must be at least 3 characters.'); return; }
   if (password.length < 6) { showAuthError('signup-error', 'Password must be at least 6 characters.'); return; }
   if (password !== confirm) { showAuthError('signup-error', 'Passwords do not match.'); return; }
+  
   const hash = await hashPassword(password);
   const id   = 'u_' + Date.now();
+  const MAX_USERS = 16; // Testing phase limit
+  
   if (USE_SUPABASE) {
     try {
+      // 1. Check total user count to enforce the limit
+      const allUsers = await sbFetch('bot_users?select=id');
+      if (allUsers.length >= MAX_USERS) { 
+        showAuthError('signup-error', `Testing Phase: Maximum limit of ${MAX_USERS} users reached.`); 
+        return; 
+      }
+
+      // 2. Check if username is already taken
       const exists = await sbFetch(`bot_users?username=eq.${encodeURIComponent(username)}&select=id`);
       if (exists.length) { showAuthError('signup-error', 'Username already taken.'); return; }
+      
+      // 3. Create the account
       const created = await sbFetch('bot_users', 'POST', { id, username, password_hash: hash });
       currentUser = { id: created[0].id, username };
     } catch { showAuthError('signup-error', 'Could not create account. Check Supabase config.'); return; }
   } else {
     const users = JSON.parse(localStorage.getItem(LS.users) || '{}');
+    
+    // 1. Check total user count locally
+    if (Object.keys(users).length >= MAX_USERS) {
+      showAuthError('signup-error', `Testing Phase: Maximum limit of ${MAX_USERS} users reached.`); 
+      return; 
+    }
+    
+    // 2. Check if username is taken
     if (users[username]) { showAuthError('signup-error', 'Username already taken.'); return; }
+    
+    // 3. Create local account
     users[username] = { id, passwordHash: hash };
     localStorage.setItem(LS.users, JSON.stringify(users));
     currentUser = { id, username };
   }
+  
   localStorage.setItem(LS.session, JSON.stringify(currentUser));
   profile = null; entries = []; showScreen('onboarding-screen');
 }
