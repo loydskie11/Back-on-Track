@@ -41,13 +41,15 @@ async function processQueue() {
         const p = op.payload;
         await sbFetch('bot_entries', 'POST', {
           id: p.id, user_id: p.user_id, status: p.status,
-          day_number: p.dayNumber, date: p.date, hours: p.hours, details: p.details
+          day_number: p.dayNumber, date: p.date, hours: p.hours,
+          time_in: p.timeIn, time_out: p.timeOut, details: p.details
         });
       } else if (op.type === 'edit') {
         const p = op.payload;
         await sbFetch(`bot_entries?id=eq.${p.id}`, 'PATCH', {
           status: p.status, day_number: p.dayNumber,
-          date: p.date, hours: p.hours, details: p.details
+          date: p.date, hours: p.hours, 
+          time_in: p.timeIn, time_out: p.timeOut, details: p.details
         });
       } else if (op.type === 'delete') {
         await sbFetch(`bot_entries?id=eq.${op.payload.id}`, 'DELETE');
@@ -300,7 +302,10 @@ async function loadUserData() {
         if (localP) profile = JSON.parse(localP);
       }
 
-      entries = ents.map(e => ({ id: e.id, status: e.status || 'present', dayNumber: e.day_number, date: e.date, hours: e.hours || 0, details: e.details || '' }));
+      entries = ents.map(e => ({ 
+        id: e.id, status: e.status || 'present', dayNumber: e.day_number, 
+        date: e.date, hours: e.hours || 0, timeIn: e.time_in, timeOut: e.time_out, details: e.details || '' 
+      }));
       
       // FIX: Also recover entries from local storage if Supabase returned empty
       if (entries.length === 0) {
@@ -596,10 +601,15 @@ function openViewModal(id) {
         ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Absent`
         : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Present`}
     </span>`;
+  const timeDisplay = (!isAbs && e.timeIn && e.timeOut) 
+    ? `<span class="entry-absent-badge" style="background:var(--indigo-50); color:var(--indigo-700); border-color:var(--indigo-100);">${e.timeIn} - ${e.timeOut}</span>` 
+    : '';
+
   document.getElementById('view-modal-hours').innerHTML = isAbs ? '' :
     `<div style="display:flex;align-items:center;gap:8px;">
        <span style="font-size:.8rem;font-weight:600;color:var(--text-secondary);">Hours worked:</span>
        <span class="entry-hours-badge">${Number(e.hours) % 1 === 0 ? Number(e.hours) : Number(e.hours).toFixed(1)} hrs</span>
+       ${timeDisplay}
      </div>`;
   document.getElementById('view-details-label').textContent = isAbs ? 'Reason for Absence' : 'Work Details';
   document.getElementById('view-modal-details').textContent = e.details;
@@ -635,6 +645,30 @@ function nextPresentDayNumber() {
   return presentEntries.length > 0 ? Math.max(...presentEntries.map(e => e.dayNumber)) + 1 : 1;
 }
 
+/* ════ HOURS CALCULATION ═════════════════════════════════════ */
+function calculateHours() {
+  const tIn = document.getElementById('entry-time-in').value;
+  const tOut = document.getElementById('entry-time-out').value;
+  let hrs = 0;
+  
+  if (tIn && tOut) {
+    const dIn = new Date(`2000-01-01T${tIn}`);
+    let dOut = new Date(`2000-01-01T${tOut}`);
+    
+    // Handle overnight shifts (e.g. In at 10 PM, Out at 6 AM)
+    if (dOut < dIn) dOut.setDate(dOut.getDate() + 1);
+    
+    let diff = (dOut - dIn) / 3600000; // convert ms to hours
+    diff -= 1; // Automatic 1-hour deduction for lunch/break
+    
+    if (diff < 0) diff = 0;
+    hrs = diff;
+  }
+  
+  document.getElementById('entry-hours').value = hrs;
+  document.getElementById('calculated-hours').textContent = `${hrs % 1 === 0 ? hrs : hrs.toFixed(1)} hrs`;
+}
+
 function openAddModal() {
   document.getElementById('modal-title').textContent = 'Add DTR Entry';
   document.getElementById('entry-edit-id').value     = '';
@@ -642,8 +676,12 @@ function openAddModal() {
   document.getElementById('modal-error').classList.add('hidden');
   document.getElementById('entry-date').valueAsDate        = new Date();
   document.getElementById('entry-absent-date').valueAsDate = new Date();
-  document.getElementById('entry-hours').value             = '';
-  // Reset to present
+  
+  // Clear times and calculate
+  document.getElementById('entry-time-in').value = '';
+  document.getElementById('entry-time-out').value = '';
+  calculateHours();
+  
   setStatus('present');
   document.getElementById('entry-day').value = nextPresentDayNumber();
   document.getElementById('entry-modal').classList.remove('hidden');
@@ -656,12 +694,23 @@ function openEditModal(id) {
   document.getElementById('entry-details').value       = e.details;
   document.getElementById('modal-error').classList.add('hidden');
   setStatus(e.status || 'present');
+  
   if (e.status === 'absent') {
     document.getElementById('entry-absent-date').value = e.date;
   } else {
     document.getElementById('entry-day').value   = e.dayNumber;
     document.getElementById('entry-date').value  = e.date;
-    document.getElementById('entry-hours').value = e.hours;
+    
+    document.getElementById('entry-time-in').value = e.timeIn || '';
+    document.getElementById('entry-time-out').value = e.timeOut || '';
+    
+    // Check if it's a legacy entry (has hours but no timestamps)
+    if (e.timeIn && e.timeOut) {
+      calculateHours();
+    } else {
+      document.getElementById('entry-hours').value = e.hours;
+      document.getElementById('calculated-hours').textContent = `${Number(e.hours) % 1 === 0 ? Number(e.hours) : Number(e.hours).toFixed(1)} hrs (Legacy)`;
+    }
   }
   document.getElementById('entry-modal').classList.remove('hidden');
 }
@@ -674,44 +723,49 @@ async function saveEntry() {
   const status  = currentModalStatus;
   const details = document.getElementById('entry-details').value.trim();
 
-  let dayNum = null, date = '', hours = 0;
+  let dayNum = null, date = '', hours = 0, timeIn = null, timeOut = null;
 
   if (status === 'present') {
     dayNum = parseInt(document.getElementById('entry-day').value);
     date   = document.getElementById('entry-date').value;
+    timeIn = document.getElementById('entry-time-in').value;
+    timeOut = document.getElementById('entry-time-out').value;
     hours  = parseFloat(document.getElementById('entry-hours').value);
-    if (!dayNum || !date || !hours || hours <= 0 || !details) { showModalError('Please fill in all fields correctly.'); return; }
+    
+    // We only force time in/out if hours is 0 (prevents blocking legacy entries)
+    if (!dayNum || !date || (!timeIn && hours <= 0) || (!timeOut && hours <= 0) || !details) { 
+      showModalError('Please fill in all fields correctly.'); return; 
+    }
     if (hours > 24) { showModalError('Hours cannot exceed 24.'); return; }
   } else {
     date = document.getElementById('entry-absent-date').value;
     if (!date || !details) { showModalError('Please fill in the date and reason.'); return; }
-    hours  = 0;
-    dayNum = null; // absent has no day number
+    hours = 0; dayNum = null; timeIn = null; timeOut = null;
   }
 
   if (editId) {
     const idx = entries.findIndex(e => e.id === editId); if (idx === -1) return;
-    const updated = { ...entries[idx], status, dayNumber: dayNum, date, hours, details };
+    const updated = { ...entries[idx], status, dayNumber: dayNum, date, hours, timeIn, timeOut, details };
     if (USE_SUPABASE) {
       if (navigator.onLine) {
-        try { await sbFetch(`bot_entries?id=eq.${editId}`, 'PATCH', { status, day_number: dayNum, date, hours, details }); }
-        catch { enqueue({ type: 'edit', payload: { id: editId, status, dayNumber: dayNum, date, hours, details } }); }
+        try { await sbFetch(`bot_entries?id=eq.${editId}`, 'PATCH', { status, day_number: dayNum, date, hours, time_in: timeIn, time_out: timeOut, details }); }
+        catch { enqueue({ type: 'edit', payload: { id: editId, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details } }); }
       } else {
         const q = getQueue().filter(op => !(op.payload?.id === editId && (op.type === 'edit' || op.type === 'add')));
-        q.push({ type: 'edit', payload: { id: editId, status, dayNumber: dayNum, date, hours, details }, ts: Date.now() });
+        q.push({ type: 'edit', payload: { id: editId, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details }, ts: Date.now() });
         saveQueue(q); updateOfflineBanner();
       }
     }
     entries[idx] = updated;
   } else {
     const id    = 'e_' + Date.now();
-    const entry = { id, status, dayNumber: dayNum, date, hours, details };
+    const entry = { id, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details };
     if (USE_SUPABASE) {
       if (navigator.onLine) {
-        try { await sbFetch('bot_entries', 'POST', { id, user_id: currentUser.id, status, day_number: dayNum, date, hours, details }); }
-        catch { enqueue({ type: 'add', payload: { id, user_id: currentUser.id, status, dayNumber: dayNum, date, hours, details } }); }
+        try { await sbFetch('bot_entries', 'POST', { id, user_id: currentUser.id, status, day_number: dayNum, date, hours, time_in: timeIn, time_out: timeOut, details }); }
+        catch { enqueue({ type: 'add', payload: { id, user_id: currentUser.id, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details } }); }
       } else {
-        enqueue({ type: 'add', payload: { id, user_id: currentUser.id, status, dayNumber: dayNum, date, hours, details } });
+        enqueue({ type: 'add', payload: { id, user_id: currentUser.id, status, dayNumber: dayNum, date, hours, timeIn, timeOut, details } });
         updateOfflineBanner();
       }
     }
@@ -720,13 +774,9 @@ async function saveEntry() {
 
   await saveEntries_data();
   closeEntryModal();
-  renderDashboard();
-  renderCalendar();
-  renderEntries();
+  renderDashboard(); renderCalendar(); renderEntries();
   const offline = !navigator.onLine && USE_SUPABASE;
-  showToast(editId
-    ? (offline ? 'Entry updated (syncs when online)' : 'Entry updated ✓')
-    : (offline ? 'Entry saved (syncs when online)'   : 'Entry added ✓'));
+  showToast(editId ? (offline ? 'Entry updated (syncs when online)' : 'Entry updated ✓') : (offline ? 'Entry saved (syncs when online)' : 'Entry added ✓'));
 }
 
 function showModalError(msg) { const el = document.getElementById('modal-error'); el.textContent = msg; el.classList.remove('hidden'); }
