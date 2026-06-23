@@ -22,6 +22,39 @@
   --header-h:60px; --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 
+/* ─── Custom Themes ──────────────────────────────── */
+[data-theme="earthy"] {
+  --indigo-50: #fbf8f6; 
+  --indigo-100: #f5ece5; 
+  --indigo-200: #e8d6c8;
+  --indigo-400: #c29b82; 
+  --indigo-500: #aa7b5f; 
+  --indigo-600: #8c5e42;
+  --indigo-700: #714b36; 
+  --indigo-800: #5d3f2e; 
+  --indigo-900: #4d3527;
+  --primary: var(--indigo-700); 
+  --primary-hover: var(--indigo-800);
+  --primary-light: var(--indigo-200); 
+  --primary-ring: var(--indigo-400);
+}
+
+[data-theme="high-contrast"] {
+  --indigo-50: #f9fafb; 
+  --indigo-100: #f3f4f6; 
+  --indigo-200: #e5e7eb;
+  --indigo-400: #6b7280; 
+  --indigo-500: #374151; 
+  --indigo-600: #1f2937;
+  --indigo-700: #111827; /* Deep Black */
+  --indigo-800: #000000; 
+  --indigo-900: #000000;
+  --primary: var(--indigo-700); 
+  --primary-hover: var(--indigo-800);
+  --primary-light: var(--indigo-400); 
+  --primary-ring: var(--indigo-500);
+}
+
 html{-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
 body{font-family:var(--font);background:var(--bg);color:var(--text-primary);
   min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased}

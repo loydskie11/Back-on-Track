@@ -22,6 +22,15 @@ function enqueue(op) {
   const q = getQueue(); q.push({ ...op, ts: Date.now() }); saveQueue(q);
 }
 
+function applyTheme(themeName) {
+  document.body.setAttribute('data-theme', themeName);
+  localStorage.setItem('bot_theme', themeName);
+}
+
+// Apply the saved theme immediately on load
+const savedTheme = localStorage.getItem('bot_theme') || 'default';
+applyTheme(savedTheme);
+
 async function processQueue() {
   if (!USE_SUPABASE || !navigator.onLine) return;
   const q = getQueue(); if (!q.length) return;
@@ -715,6 +724,7 @@ function openProfileModal() {
   document.getElementById('prof-address').value    = profile.address;
   document.getElementById('prof-supervisor').value = profile.supervisor;
   document.getElementById('prof-hours').value      = profile.requiredHours;
+  document.getElementById('prof-theme').value = localStorage.getItem('bot_theme') || 'default';
   document.getElementById('profile-modal').classList.remove('hidden');
 }
 function closeProfileModal()     { document.getElementById('profile-modal').classList.add('hidden'); }
@@ -729,6 +739,8 @@ async function saveProfile() {
   const hrs        = parseFloat(document.getElementById('prof-hours').value);
   if (!name || !course || !company || !address || !supervisor || !hrs || hrs < 1) { showToast('Please fill in all fields.'); return; }
   profile = { name, course, company, address, supervisor, requiredHours: hrs };
+  const selectedTheme = document.getElementById('prof-theme').value;
+  applyTheme(selectedTheme);
   await saveProfile_data();
   closeProfileModal(); renderDashboard();
   showToast(!navigator.onLine && USE_SUPABASE ? 'Profile saved (syncs when online)' : 'Profile saved ✓');

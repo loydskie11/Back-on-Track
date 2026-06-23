@@ -22,9 +22,9 @@
     <div class="auth-brand">
       <div class="auth-logo">
         <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-          <rect width="36" height="36" rx="10" fill="#4338ca"/>
+          <rect width="36" height="36" rx="10" fill="var(--primary)"/>
           <path d="M10 22 L14 14 L18 20 L22 12 L26 18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <circle cx="26" cy="18" r="2" fill="#a5b4fc"/>
+          <circle cx="26" cy="18" r="2" fill="var(--primary-light)"/>
         </svg>
       </div>
       <h1 class="auth-title">Back on Track</h1>
@@ -88,9 +88,9 @@
     <div class="onboarding-header">
       <div class="auth-logo" style="margin:0 auto 12px;">
         <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-          <rect width="36" height="36" rx="10" fill="#4338ca"/>
+          <rect width="36" height="36" rx="10" fill="var(--primary)"/>
           <path d="M10 22 L14 14 L18 20 L22 12 L26 18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <circle cx="26" cy="18" r="2" fill="#a5b4fc"/>
+          <circle cx="26" cy="18" r="2" fill="var(--primary-light)"/>
         </svg>
       </div>
       <h2>Set Up Your Profile</h2>
@@ -136,9 +136,9 @@
     <div class="header-left">
       <div class="header-logo">
         <svg width="22" height="22" viewBox="0 0 36 36" fill="none">
-          <rect width="36" height="36" rx="10" fill="#4338ca"/>
+          <rect width="36" height="36" rx="10" fill="var(--primary)"/>
           <path d="M10 22 L14 14 L18 20 L22 12 L26 18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <circle cx="26" cy="18" r="2" fill="#a5b4fc"/>
+          <circle cx="26" cy="18" r="2" fill="var(--primary-light)"/>
         </svg>
       </div>
       <span class="header-title">Back on Track</span>
@@ -374,6 +374,14 @@
       <div class="field-group"><label class="field-label">Company Address</label><input type="text" id="prof-address" class="field-input" /></div>
       <div class="field-group"><label class="field-label">Supervisor Name</label><input type="text" id="prof-supervisor" class="field-input" /></div>
       <div class="field-group"><label class="field-label">Total Required Hours</label><input type="number" id="prof-hours" class="field-input" min="1" /></div>
+      <div class="field-group" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-100);">
+        <label class="field-label">App Theme</label>
+        <select id="prof-theme" class="field-input">
+          <option value="default">Indigo (Default)</option>
+          <option value="earthy">Warm Earth</option>
+          <option value="high-contrast">Professional High-Contrast</option>
+        </select>
+      </div>
     </div>
     <div class="modal-footer" style="flex-direction:column;gap:8px;">
       <button class="btn-primary full" onclick="saveProfile()">Save Changes</button>
