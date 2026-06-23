@@ -368,7 +368,6 @@
       </button>
     </div>
     
-    <!-- Added 'settings-body' class for the iOS gray background -->
     <div class="modal-body settings-body">
       
       <!-- Group 1: Personal Info -->
@@ -442,13 +441,19 @@
           <div class="settings-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
           </div>
-          <div class="settings-field">
+          <!-- Custom Select Container -->
+          <div class="settings-field" style="position: relative;">
             <label class="field-label">App Theme</label>
-            <select id="prof-theme" class="settings-input">
-              <option value="default">Indigo (Default)</option>
-              <option value="earthy">Warm Earth</option>
-              <option value="high-contrast">Professional High-Contrast</option>
-            </select>
+            <input type="hidden" id="prof-theme" value="default" />
+            <div class="custom-select" onclick="toggleThemeDropdown(event)">
+              <span id="theme-label">Indigo (Default)</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-menu hidden" id="theme-menu">
+              <div class="custom-select-option" onclick="selectThemeOpt('default', 'Indigo (Default)')">Indigo (Default)</div>
+              <div class="custom-select-option" onclick="selectThemeOpt('earthy', 'Warm Earth')">Warm Earth</div>
+              <div class="custom-select-option" onclick="selectThemeOpt('high-contrast', 'Professional High-Contrast')">Professional High-Contrast</div>
+            </div>
           </div>
         </div>
       </div>
@@ -457,7 +462,21 @@
     
     <div class="modal-footer" style="flex-direction:column;gap:8px;">
       <button class="btn-primary full" onclick="saveProfile()">Save Changes</button>
-      <button class="btn-danger full" onclick="confirmSignOut()">Sign Out</button>
+      <button class="btn-ghost-danger full" onclick="confirmSignOut()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── SIGN OUT MODAL ───────────────── -->
+<div id="signout-modal" class="modal-overlay hidden" onclick="closeSignOutOutside(event)">
+  <div class="modal-card modal-sm">
+    <div class="modal-header"><h3>Sign Out</h3></div>
+    <div class="modal-body">
+      <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.5;">Are you sure you want to sign out of Back on Track?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeSignOutModal()">Cancel</button>
+      <button class="btn-danger" onclick="executeSignOut()">Sign Out</button>
     </div>
   </div>
 </div>

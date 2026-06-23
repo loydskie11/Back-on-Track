@@ -450,9 +450,16 @@ input[type="date"]{color-scheme:light}
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
 
+/* ─── Ghost Danger Button ────────────────────────── */
+.btn-ghost-danger{padding:13px 22px;background:transparent;color:var(--red-600);
+  border:1.5px solid var(--red-500);border-radius:var(--radius-md);font-size:.9375rem;
+  font-weight:600;cursor:pointer;transition:all .18s;font-family:var(--font);white-space:nowrap}
+.btn-ghost-danger:hover{background:#fef2f2;border-color:var(--red-600)}
+.btn-ghost-danger.full{width:100%}
+
 /* ─── Settings Modal (Bento / iOS Style) ───────────────── */
 #profile-modal .settings-body {
-  background: var(--bg); /* Light gray background for contrast */
+  background: var(--bg);
   padding: 24px 20px;
   gap: 0;
 }
@@ -466,16 +473,14 @@ input[type="date"]{color-scheme:light}
   margin: 0 0 8px 12px;
 }
 
-.settings-section-title:not(:first-child) {
-  margin-top: 24px;
-}
+.settings-section-title:not(:first-child) { margin-top: 24px; }
 
 .settings-group {
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
   box-shadow: var(--shadow-xs);
+  /* overflow: hidden removed so dropdown can overlap */
 }
 
 .settings-row {
@@ -487,66 +492,53 @@ input[type="date"]{color-scheme:light}
   background: var(--surface);
 }
 
-/* Inner divider line that aligns with the text, skipping the icon */
+.settings-row:first-child { border-top-left-radius: 18px; border-top-right-radius: 18px; }
+.settings-row:last-child { border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; }
+
 .settings-row:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 56px; 
-  right: 0;
-  height: 1.5px;
-  background: var(--gray-100);
+  content: ''; position: absolute; bottom: 0; left: 56px; right: 0;
+  height: 1.5px; background: var(--gray-100);
 }
 
 .settings-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--indigo-50);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--indigo-50); color: var(--primary);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
-.settings-icon svg {
-  width: 16px;
-  height: 16px;
-}
+.settings-icon svg { width: 16px; height: 16px; }
 
 .settings-field {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 6px 0;
+  flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 6px 0;
+  min-width: 0; /* FIX: Prevents input values from forcing horizontal overflow */
 }
 
-.settings-field .field-label {
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-  margin-bottom: 0;
-}
+.settings-field .field-label { font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 0; }
 
-/* Remove default input styling so it blends into the row */
 .settings-input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  padding: 0;
-  font-size: 0.95rem;
-  font-weight: 500;
-  font-family: var(--font);
-  color: var(--text-primary);
-  outline: none;
-  -webkit-appearance: none;
+  width: 100%; border: none; background: transparent; padding: 0;
+  font-size: 0.95rem; font-weight: 500; font-family: var(--font);
+  color: var(--text-primary); outline: none; -webkit-appearance: none;
 }
 
-.settings-input:focus {
-  color: var(--primary);
-}
+.settings-input:focus { color: var(--primary); }
 
-select.settings-input {
-  cursor: pointer;
+/* ─── Custom Select UI ───────────────────────────── */
+.custom-select {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 0 0 0; cursor: pointer; font-size: 0.95rem;
+  font-weight: 500; color: var(--text-primary); user-select: none;
 }
+.custom-select svg { width: 18px; height: 18px; color: var(--text-tertiary); }
+.custom-select-menu {
+  position: absolute; top: calc(100% + 8px); left: -16px; right: -16px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+  z-index: 110; overflow: hidden;
+}
+.custom-select-option {
+  padding: 12px 16px; font-size: 0.9rem; font-weight: 500;
+  cursor: pointer; transition: background .15s;
+}
+.custom-select-option:not(:last-child) { border-bottom: 1px solid var(--gray-100); }
+.custom-select-option:hover { background: var(--gray-50); color: var(--primary); }

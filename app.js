@@ -724,9 +724,20 @@ function openProfileModal() {
   document.getElementById('prof-address').value    = profile.address;
   document.getElementById('prof-supervisor').value = profile.supervisor;
   document.getElementById('prof-hours').value      = profile.requiredHours;
-  document.getElementById('prof-theme').value = localStorage.getItem('bot_theme') || 'default';
+  
+  // Set custom theme dropdown state
+  const savedT = localStorage.getItem('bot_theme') || 'default';
+  document.getElementById('prof-theme').value = savedT;
+  const labels = {
+    'default': 'Indigo (Default)',
+    'earthy': 'Warm Earth',
+    'high-contrast': 'Professional High-Contrast'
+  };
+  document.getElementById('theme-label').textContent = labels[savedT] || 'Indigo (Default)';
+  
   document.getElementById('profile-modal').classList.remove('hidden');
 }
+
 function closeProfileModal()     { document.getElementById('profile-modal').classList.add('hidden'); }
 function closeProfileOutside(e)  { if (e.target.classList.contains('modal-overlay')) closeProfileModal(); }
 
@@ -739,23 +750,58 @@ async function saveProfile() {
   const hrs        = parseFloat(document.getElementById('prof-hours').value);
   if (!name || !course || !company || !address || !supervisor || !hrs || hrs < 1) { showToast('Please fill in all fields.'); return; }
   profile = { name, course, company, address, supervisor, requiredHours: hrs };
+  
   const selectedTheme = document.getElementById('prof-theme').value;
   applyTheme(selectedTheme);
+  
   await saveProfile_data();
   closeProfileModal(); renderDashboard();
   showToast(!navigator.onLine && USE_SUPABASE ? 'Profile saved (syncs when online)' : 'Profile saved ✓');
   updateOfflineBanner();
 }
 
+/* ════ SIGN OUT MODAL ═════════════════════════════════════════ */
 function confirmSignOut() {
-  if (confirm('Sign out of Back on Track?')) {
-    currentUser = null; profile = null; entries = [];
-    localStorage.removeItem(LS.session);
-    closeProfileModal(); showScreen('auth-screen');
-    document.getElementById('signin-username').value = '';
-    document.getElementById('signin-password').value = '';
-  }
+  document.getElementById('signout-modal').classList.remove('hidden');
 }
+
+function closeSignOutModal() {
+  document.getElementById('signout-modal').classList.add('hidden');
+}
+
+function closeSignOutOutside(e) {
+  if (e.target.classList.contains('modal-overlay')) closeSignOutModal();
+}
+
+function executeSignOut() {
+  currentUser = null; profile = null; entries = [];
+  localStorage.removeItem(LS.session);
+  closeSignOutModal();
+  closeProfileModal();
+  showScreen('auth-screen');
+  document.getElementById('signin-username').value = '';
+  document.getElementById('signin-password').value = '';
+}
+
+/* ════ CUSTOM DROPDOWN ════════════════════════════════════════ */
+function toggleThemeDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('theme-menu').classList.toggle('hidden');
+}
+
+function selectThemeOpt(val, label) {
+  document.getElementById('prof-theme').value = val;
+  document.getElementById('theme-label').textContent = label;
+  document.getElementById('theme-menu').classList.add('hidden');
+}
+
+// Close custom dropdown when clicking outside
+document.addEventListener('click', () => {
+  const menu = document.getElementById('theme-menu');
+  if (menu && !menu.classList.contains('hidden')) {
+    menu.classList.add('hidden');
+  }
+});
 
 /* ════ UTILITIES ══════════════════════════════════════════════ */
 function showToast(msg) {
