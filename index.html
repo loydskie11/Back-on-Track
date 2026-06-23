@@ -536,6 +536,16 @@
       <div class="settings-section-title">Data Management</div>
       <div class="settings-group">
         
+        <!-- Export DTR Row -->
+        <div class="settings-row" style="cursor: pointer;" onclick="openDtrModal()">
+          <div class="settings-icon" style="background: var(--indigo-100); color: var(--indigo-700);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><polyline points="6 14 12 20 18 14"/><line x1="12" y1="20" x2="12" y2="4"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary); cursor: pointer;">Export DTR (Form 48)</label>
+          </div>
+        </div>
+
         <div class="settings-row" style="cursor: pointer;" onclick="backupData()">
           <div class="settings-icon" style="background: var(--indigo-100); color: var(--indigo-700);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -593,6 +603,54 @@
     </div>
   </div>
 </div>
+
+<!-- ───────────────── EXPORT DTR MODAL ───────────────── -->
+<div id="dtr-modal" class="modal-overlay hidden" onclick="closeDtrOutside(event)">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <h3>Export Form 48</h3>
+      <button class="modal-close" onclick="closeDtrModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body settings-body" style="padding-top: 16px;">
+      
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-field" style="flex-direction: row; justify-content: space-between; align-items: center;">
+            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary);">Print 2 Copies (Side-by-Side)</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="dtr-format-toggle" onchange="handleDtrFormatToggle(event)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="settings-row">
+          <div class="settings-field" style="flex-direction: row; justify-content: space-between; align-items: center;">
+            <label class="field-label" id="label-month-1" style="font-size: 0.95rem; color: var(--text-primary);">Month</label>
+            <input type="month" id="dtr-month-1" class="settings-input" style="width: auto; text-align: right;" onchange="validateDtrExport()" />
+          </div>
+        </div>
+
+        <div class="settings-row hidden" id="dtr-month-2-row">
+          <div class="settings-field" style="flex-direction: row; justify-content: space-between; align-items: center;">
+            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary);">Month 2</label>
+            <input type="month" id="dtr-month-2" class="settings-input" style="width: auto; text-align: right;" onchange="validateDtrExport()" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeDtrModal()">Cancel</button>
+      <button class="btn-primary" id="btn-print-dtr" onclick="executeDtrPrint()" disabled style="opacity: 0.6; cursor: not-allowed;">Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── HIDDEN PRINT TEMPLATE ───────────────── -->
+<div id="print-area" class="print-only"></div>
 
 <div id="toast" class="toast hidden"></div>
 <script src="app.js"></script>

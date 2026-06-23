@@ -1209,3 +1209,209 @@ function initReminderChecker() {
   }, 60000); // Check every 60 seconds
 }
 
+/* ════ EXPORT DTR (FORM 48) ═══════════════════════════════════ */
+function openDtrModal() {
+  document.getElementById('dtr-format-toggle').checked = false;
+  document.getElementById('dtr-month-1').value = '';
+  document.getElementById('dtr-month-2').value = '';
+  document.getElementById('dtr-month-2-row').classList.add('hidden');
+  document.getElementById('label-month-1').textContent = 'Month';
+  validateDtrExport();
+  
+  closeProfileModal();
+  document.getElementById('dtr-modal').classList.remove('hidden');
+}
+
+function closeDtrModal() {
+  document.getElementById('dtr-modal').classList.add('hidden');
+}
+
+function closeDtrOutside(e) {
+  if (e.target.classList.contains('modal-overlay')) closeDtrModal();
+}
+
+function handleDtrFormatToggle(e) {
+  const isTwoCopies = e.target.checked;
+  const row2 = document.getElementById('dtr-month-2-row');
+  const label1 = document.getElementById('label-month-1');
+  
+  if (isTwoCopies) {
+    row2.classList.remove('hidden');
+    label1.textContent = 'Month 1';
+  } else {
+    row2.classList.add('hidden');
+    document.getElementById('dtr-month-2').value = '';
+    label1.textContent = 'Month';
+  }
+  validateDtrExport();
+}
+
+function validateDtrExport() {
+  const isTwoCopies = document.getElementById('dtr-format-toggle').checked;
+  const m1 = document.getElementById('dtr-month-1').value;
+  const m2 = document.getElementById('dtr-month-2').value;
+  const btn = document.getElementById('btn-print-dtr');
+  
+  let isValid = false;
+  if (isTwoCopies) {
+    isValid = m1 !== '' && m2 !== '';
+  } else {
+    isValid = m1 !== '';
+  }
+  
+  if (isValid) {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  } else {
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+  }
+}
+
+// Helper to generate one physical copy of Form 48
+function buildDtrCopyHtml(monthValue) {
+  if (!monthValue) return '';
+  
+  // Parse month
+  const [yearStr, monthStr] = monthValue.split('-');
+  const yearNum = parseInt(yearStr);
+  const monthIdx = parseInt(monthStr) - 1; // 0-based
+  const dateObj = new Date(yearNum, monthIdx, 1);
+  const monthName = dateObj.toLocaleDateString('en-PH', { month: 'long' });
+  const daysInMonth = new Date(yearNum, monthIdx + 1, 0).getDate();
+  
+  const empName = profile && profile.name ? profile.name : '';
+  
+  // Filter entries for this specific month/year
+  const monthEntries = entries.filter(e => {
+    if (e.status === 'absent') return false;
+    const ed = new Date(e.date + 'T00:00:00');
+    return ed.getFullYear() === yearNum && ed.getMonth() === monthIdx;
+  });
+  
+  // Build lookup map by day number
+  const dayMap = {};
+  monthEntries.forEach(e => {
+    const ed = new Date(e.date + 'T00:00:00');
+    dayMap[ed.getDate()] = e;
+  });
+
+  let rowsHtml = '';
+  let totalHours = 0;
+  
+  for (let d = 1; d <= 31; d++) {
+    if (d > daysInMonth) {
+      // Blank out rows for days that don't exist in this month (e.g. Feb 30)
+      rowsHtml += `<tr><td>${d}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+      continue;
+    }
+    
+    const ent = dayMap[d];
+    if (ent) {
+      const amI = ent.amIn ? formatTimePrint(ent.amIn) : '';
+      const amO = ent.amOut ? formatTimePrint(ent.amOut) : '';
+      const pmI = ent.pmIn ? formatTimePrint(ent.pmIn) : '';
+      const pmO = ent.pmOut ? formatTimePrint(ent.pmOut) : '';
+      totalHours += parseFloat(ent.hours || 0);
+      rowsHtml += `<tr><td>${d}</td><td>${amI}</td><td>${amO}</td><td>${pmI}</td><td>${pmO}</td><td></td><td></td></tr>`;
+    } else {
+      // Empty row
+      rowsHtml += `<tr><td>${d}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+    }
+  }
+
+  // Format the total calculation line
+  const totalDisplay = `${totalHours % 1 === 0 ? totalHours : totalHours.toFixed(1)} hrs`;
+
+  return `
+    <div class="dtr-copy">
+      <h5>Civil Service Form No. 48</h5>
+      <h2>DAILY TIME RECORD</h2>
+      
+      <div style="text-align: center; margin-bottom: 8px;">
+        <div class="dtr-line" style="width: 80%;">${empName}</div>
+        <div class="dtr-text">(Name)</div>
+      </div>
+      
+      <div style="margin-bottom: 8px;" class="dtr-text">
+        For the month of <span class="dtr-line" style="width: 120px;">${monthName}</span> 20<span class="dtr-line" style="width: 40px;">${yearStr.slice(-2)}</span><br>
+        Official hours of arrival and departure:<br>
+        Regular Days <span class="dtr-line" style="width: 100px;"></span> Saturdays <span class="dtr-line" style="width: 100px;"></span>
+      </div>
+      
+      <table class="dtr-table">
+        <thead>
+          <tr>
+            <th rowspan="2" style="width:10%;">Days</th>
+            <th colspan="2" style="width:30%;">A. M.</th>
+            <th colspan="2" style="width:30%;">P. M.</th>
+            <th colspan="2" style="width:30%;">UNDER TIME</th>
+          </tr>
+          <tr>
+            <th>ARRIVAL</th>
+            <th>DEPARTURE</th>
+            <th>ARRIVAL</th>
+            <th>DEPARTURE</th>
+            <th>Hours</th>
+            <th>Minutes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+          <tr>
+            <td colspan="5" style="text-align:right; font-weight:bold; padding-right:10px;">TOTAL</td>
+            <td colspan="2" style="font-weight:bold;">${totalDisplay}</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <p class="dtr-cert">
+        I CERTIFY on my honor that the above is a true and correct report of the hours of work performed, record of which was made daily at the time of arrival and departure from office.
+      </p>
+      
+      <div class="dtr-signature">
+        <div class="dtr-signature-line"></div>
+        Verified as to the prescribed office hours:<br><br>
+        <div class="dtr-signature-line"></div>
+        In-Charge
+      </div>
+    </div>
+  `;
+}
+
+function formatTimePrint(timeStr) {
+  if (!timeStr) return '';
+  const [h, m] = timeStr.split(':');
+  let hour = parseInt(h, 10);
+  if (hour === 0) hour = 12;
+  else if (hour > 12) hour -= 12;
+  return `${String(hour).padStart(2,'0')}:${m}`;
+}
+
+function executeDtrPrint() {
+  const isTwoCopies = document.getElementById('dtr-format-toggle').checked;
+  const m1 = document.getElementById('dtr-month-1').value;
+  const m2 = document.getElementById('dtr-month-2').value;
+  
+  const printArea = document.getElementById('print-area');
+  
+  if (isTwoCopies) {
+    // Generate side-by-side
+    const copy1 = buildDtrCopyHtml(m1);
+    const copy2 = buildDtrCopyHtml(m2);
+    printArea.innerHTML = copy1 + copy2;
+  } else {
+    // Generate just one
+    printArea.innerHTML = buildDtrCopyHtml(m1);
+  }
+  
+  closeDtrModal();
+  
+  // Slight delay to allow CSS to unhide print area
+  setTimeout(() => {
+    window.print();
+  }, 150);
+}
+
