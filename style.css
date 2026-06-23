@@ -629,37 +629,65 @@ input[type="date"]{color-scheme:light}
 .print-only { display: none; }
 
 @media print {
-  @page { margin: 10mm; }
+  @page { 
+    /* Setting margin to 0 completely removes the browser's default headers/footers (watermarks) */
+    margin: 0; 
+  }
   
   /* Hide the app UI completely */
   body > *:not(#print-area) { display: none !important; }
   
-  /* Reset background and prepare physical paper styles */
-  body { background: white; margin: 0; padding: 0; }
+  /* Reset background and apply safe printable padding instead of page margins */
+  body { 
+    background: white; 
+    margin: 0; 
+    padding: 15mm 10mm; /* Top/Bottom 15mm, Left/Right 10mm padding */
+    box-sizing: border-box;
+  }
   
   #print-area {
     display: flex;
-    gap: 40px;
+    flex-direction: row;
+    justify-content: center;
+    gap: 6%; /* Exactly 6% gap between the two forms */
     width: 100%;
+    max-width: 100%;
     color: black;
     font-family: "Times New Roman", Times, serif;
+    box-sizing: border-box;
   }
   
-  .dtr-copy { flex: 1; min-width: 0; }
+  .dtr-copy { 
+    width: 47%; /* 47 + 47 + 6 gap = 100%. Forces exact side-by-side split */
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
   
   /* Typography to match Form 48 */
-  .dtr-copy h5 { font-size: 9pt; font-weight: normal; margin: 0 0 2px; }
-  .dtr-copy h2 { font-size: 14pt; font-weight: bold; margin: 0 0 10px; text-align: center; }
-  .dtr-line { border-bottom: 1px solid black; display: inline-block; font-weight: bold; text-align: center; padding-bottom: 2px;}
-  .dtr-text { font-size: 9pt; }
+  .dtr-copy h5 { font-size: 8pt; font-weight: normal; margin: 0 0 2px; }
+  .dtr-copy h2 { font-size: 11pt; font-weight: bold; margin: 0 0 10px; text-align: center; }
+  .dtr-line { border-bottom: 1px solid black; display: inline-block; font-weight: bold; text-align: center; padding-bottom: 1px;}
+  .dtr-text { font-size: 8pt; }
   
-  /* Strict Table Borders */
-  .dtr-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  .dtr-table th, .dtr-table td { border: 1px solid black; text-align: center; font-size: 9pt; height: 18px; padding: 2px; }
-  .dtr-table th { font-weight: bold; }
+  /* Strict Table Borders & Layout */
+  .dtr-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 10px; 
+    table-layout: fixed; /* CRITICAL: Prevents the table from stretching out of bounds */
+  }
+  .dtr-table th, .dtr-table td { 
+    border: 1px solid black; 
+    text-align: center; 
+    font-size: 8pt; /* Scaled down slightly to fit all columns safely */
+    height: 16px; 
+    padding: 1px; 
+    overflow: hidden;
+  }
+  .dtr-table th { font-weight: bold; font-size: 7.5pt; }
   
   /* Certification block */
-  .dtr-cert { margin-top: 15px; font-size: 9pt; text-align: justify; text-indent: 20px; line-height: 1.2; }
-  .dtr-signature { margin-top: 25px; text-align: center; font-size: 9pt; }
+  .dtr-cert { margin-top: 15px; font-size: 8pt; text-align: justify; text-indent: 20px; line-height: 1.2; }
+  .dtr-signature { margin-top: 25px; text-align: center; font-size: 8pt; }
   .dtr-signature-line { border-bottom: 1px solid black; width: 60%; margin: 0 auto 4px; }
 }

@@ -1345,17 +1345,17 @@ function buildDtrCopyHtml(monthValue) {
         <thead>
           <tr>
             <th rowspan="2" style="width:10%;">Days</th>
-            <th colspan="2" style="width:30%;">A. M.</th>
-            <th colspan="2" style="width:30%;">P. M.</th>
-            <th colspan="2" style="width:30%;">UNDER TIME</th>
+            <th colspan="2" style="width:34%;">A. M.</th>
+            <th colspan="2" style="width:34%;">P. M.</th>
+            <th colspan="2" style="width:22%;">UNDER TIME</th>
           </tr>
           <tr>
-            <th>ARRIVAL</th>
-            <th>DEPARTURE</th>
-            <th>ARRIVAL</th>
-            <th>DEPARTURE</th>
-            <th>Hours</th>
-            <th>Minutes</th>
+            <th style="width:17%;">ARRIVAL</th>
+            <th style="width:17%;">DEPARTURE</th>
+            <th style="width:17%;">ARRIVAL</th>
+            <th style="width:17%;">DEPARTURE</th>
+            <th style="width:11%;">Hours</th>
+            <th style="width:11%;">Minutes</th>
           </tr>
         </thead>
         <tbody>
