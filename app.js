@@ -10,7 +10,7 @@
    Leave SUPABASE_URL as '' to use localStorage only.
    ─────────────────────────────────────────────────────────────*/
 const SUPABASE_URL      = '';  // e.g. 'https://xyzabc.supabase.co'
-const SUPABASE_ANON_KEY = ';  // e.g. 'eyJhbGciOi...'
+const SUPABASE_ANON_KEY = '';  // e.g. 'eyJhbGciOi...'
 const USE_SUPABASE = SUPABASE_URL !== '' && SUPABASE_ANON_KEY !== '';
 
 /* ════ OFFLINE QUEUE ════════════════════════════════════════ */
