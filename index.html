@@ -216,20 +216,16 @@
     </div>
 
     <!-- Entries Panel -->
+    <!-- Entries Panel -->
     <div id="panel-entries" class="view-panel">
-      <!-- Updated to flex-row so the search bar and export button sit side-by-side -->
-      <div class="entries-header" style="flex-direction: row; align-items: center;">
-        <div class="search-wrap" style="flex: 1;">
+      <div class="entries-header">
+        <div class="search-wrap">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           <input type="text" id="search-input" class="search-input" placeholder="Search entries…" oninput="handleSearch()" />
           <button class="search-clear-btn hidden" id="search-clear" onclick="clearSearch()" title="Clear search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
-        <!-- New CSV Export Button -->
-        <button class="icon-btn" onclick="exportToCSV()" title="Export as CSV" style="border-radius: var(--radius-md); width: 44px; height: 44px; flex-shrink: 0; background: var(--surface);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </button>
       </div>
       <div id="entries-list" class="entries-list"></div>
     </div>
@@ -533,21 +529,38 @@
         </div>
       </div>
 
-      <div class="settings-section-title">Data Management</div>
+      <!-- Group 5: Export & Print -->
+      <div class="settings-section-title">Export & Print</div>
       <div class="settings-group">
         
-        <!-- Export DTR Row -->
+        <!-- Export DTR (Form 48) Row -->
         <div class="settings-row" style="cursor: pointer;" onclick="openDtrModal()">
           <div class="settings-icon" style="background: var(--indigo-100); color: var(--indigo-700);">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><polyline points="6 14 12 20 18 14"/><line x1="12" y1="20" x2="12" y2="4"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><polyline points="6 14 12 20 18 14"/><line x1="12" y1="20" x2="12" y2="4"/></svg>
           </div>
           <div class="settings-field">
             <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary); cursor: pointer;">Export DTR (Form 48)</label>
           </div>
         </div>
 
-        <div class="settings-row" style="cursor: pointer;" onclick="backupData()">
+        <!-- Export CSV Row -->
+        <div class="settings-row" style="cursor: pointer;" onclick="exportToCSV()">
           <div class="settings-icon" style="background: var(--indigo-100); color: var(--indigo-700);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary); cursor: pointer;">Export as CSV</label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Group 6: Data Management -->
+      <div class="settings-section-title">Data Management</div>
+      <div class="settings-group">
+        
+        <div class="settings-row" style="cursor: pointer;" onclick="backupData()">
+          <div class="settings-icon" style="background: var(--gray-200); color: var(--gray-700);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </div>
           <div class="settings-field">
@@ -564,6 +577,8 @@
           </div>
           <input type="file" id="restore-file" accept=".json" class="hidden" onchange="restoreData(event)" />
         </div>
+
+      </div>
 
       </div>
 
