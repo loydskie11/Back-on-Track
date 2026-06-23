@@ -449,3 +449,104 @@ input[type="date"]{color-scheme:light}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+/* ─── Settings Modal (Bento / iOS Style) ───────────────── */
+#profile-modal .settings-body {
+  background: var(--bg); /* Light gray background for contrast */
+  padding: 24px 20px;
+  gap: 0;
+}
+
+.settings-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin: 0 0 8px 12px;
+}
+
+.settings-section-title:not(:first-child) {
+  margin-top: 24px;
+}
+
+.settings-group {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 16px;
+  position: relative;
+  background: var(--surface);
+}
+
+/* Inner divider line that aligns with the text, skipping the icon */
+.settings-row:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 56px; 
+  right: 0;
+  height: 1.5px;
+  background: var(--gray-100);
+}
+
+.settings-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--indigo-50);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.settings-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.settings-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 0;
+}
+
+.settings-field .field-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+/* Remove default input styling so it blends into the row */
+.settings-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: var(--font);
+  color: var(--text-primary);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.settings-input:focus {
+  color: var(--primary);
+}
+
+select.settings-input {
+  cursor: pointer;
+}

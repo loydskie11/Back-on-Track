@@ -362,27 +362,99 @@
 <div id="profile-modal" class="modal-overlay hidden" onclick="closeProfileOutside(event)">
   <div class="modal-card">
     <div class="modal-header">
-      <h3>Profile</h3>
+      <h3>Profile Settings</h3>
       <button class="modal-close" onclick="closeProfileModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="modal-body">
-      <div class="field-group"><label class="field-label">Full Name</label><input type="text" id="prof-name" class="field-input" /></div>
-      <div class="field-group"><label class="field-label">Course / Program</label><input type="text" id="prof-course" class="field-input" /></div>
-      <div class="field-group"><label class="field-label">Company Name</label><input type="text" id="prof-company" class="field-input" /></div>
-      <div class="field-group"><label class="field-label">Company Address</label><input type="text" id="prof-address" class="field-input" /></div>
-      <div class="field-group"><label class="field-label">Supervisor Name</label><input type="text" id="prof-supervisor" class="field-input" /></div>
-      <div class="field-group"><label class="field-label">Total Required Hours</label><input type="number" id="prof-hours" class="field-input" min="1" /></div>
-      <div class="field-group" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-100);">
-        <label class="field-label">App Theme</label>
-        <select id="prof-theme" class="field-input">
-          <option value="default">Indigo (Default)</option>
-          <option value="earthy">Warm Earth</option>
-          <option value="high-contrast">Professional High-Contrast</option>
-        </select>
+    
+    <!-- Added 'settings-body' class for the iOS gray background -->
+    <div class="modal-body settings-body">
+      
+      <!-- Group 1: Personal Info -->
+      <div class="settings-section-title">Personal Information</div>
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label">Full Name</label>
+            <input type="text" id="prof-name" class="settings-input" />
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label">Course / Program</label>
+            <input type="text" id="prof-course" class="settings-input" />
+          </div>
+        </div>
       </div>
+
+      <!-- Group 2: OJT Details -->
+      <div class="settings-section-title">OJT Details</div>
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label">Company Name</label>
+            <input type="text" id="prof-company" class="settings-input" />
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label">Company Address</label>
+            <input type="text" id="prof-address" class="settings-input" />
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label">Supervisor Name</label>
+            <input type="text" id="prof-supervisor" class="settings-input" />
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label">Total Required Hours</label>
+            <input type="number" id="prof-hours" class="settings-input" min="1" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 3: App Preferences -->
+      <div class="settings-section-title">Preferences</div>
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label">App Theme</label>
+            <select id="prof-theme" class="settings-input">
+              <option value="default">Indigo (Default)</option>
+              <option value="earthy">Warm Earth</option>
+              <option value="high-contrast">Professional High-Contrast</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
     </div>
+    
     <div class="modal-footer" style="flex-direction:column;gap:8px;">
       <button class="btn-primary full" onclick="saveProfile()">Save Changes</button>
       <button class="btn-danger full" onclick="confirmSignOut()">Sign Out</button>
