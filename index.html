@@ -500,6 +500,30 @@
         </div>
       </div>
 
+      <div class="settings-section-title">Data Management</div>
+      <div class="settings-group">
+        
+        <div class="settings-row" style="cursor: pointer;" onclick="backupData()">
+          <div class="settings-icon" style="background: var(--indigo-100); color: var(--indigo-700);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary); cursor: pointer;">Backup Data</label>
+          </div>
+        </div>
+
+        <div class="settings-row" style="cursor: pointer;" onclick="document.getElementById('restore-file').click()">
+          <div class="settings-icon" style="background: var(--gray-200); color: var(--gray-700);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="settings-field">
+            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary); cursor: pointer;">Restore Data</label>
+          </div>
+          <input type="file" id="restore-file" accept=".json" class="hidden" onchange="restoreData(event)" />
+        </div>
+
+      </div>
+
     </div>
     
     <div class="modal-footer" style="flex-direction:column;gap:8px;">

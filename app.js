@@ -941,6 +941,82 @@ function exportToCSV() {
   showToast('Exported to CSV ✓');
 }
 
+/* ════ DATA BACKUP & RESTORE ══════════════════════════════════ */
+function backupData() {
+  if (!profile && entries.length === 0) {
+    showToast('No data to backup.');
+    return;
+  }
+  
+  const backupObj = {
+    bot_version: "2.0",
+    timestamp: new Date().toISOString(),
+    profile: profile,
+    entries: entries
+  };
+  
+  // Create JSON Blob and trigger download
+  const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  
+  const dateStr = new Date().toISOString().split('T')[0];
+  const userName = profile && profile.name ? profile.name.replace(/\s+/g, '_') : 'User';
+  link.download = `BOT_Backup_${userName}_${dateStr}.json`;
+  
+  link.href = url;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  
+  showToast('Backup saved ✓');
+}
+
+function restoreData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      
+      // Basic validation to ensure it's our app's backup file
+      if (!data.profile && !data.entries) {
+        throw new Error('Invalid backup file');
+      }
+      
+      // Ask for confirmation before overwriting
+      if (confirm('Restoring data will overwrite your current profile and entries. Are you sure you want to continue?')) {
+        
+        if (data.profile) profile = data.profile;
+        if (data.entries) entries = data.entries;
+        
+        // Save to local storage
+        await saveProfile_data();
+        await saveEntries_data();
+        
+        // Update UI
+        renderDashboard();
+        renderCalendar();
+        renderEntries();
+        closeProfileModal();
+        
+        showToast('Data restored successfully ✓');
+      }
+    } catch (err) {
+      showToast('Error: Invalid backup file format.');
+      console.error(err);
+    } finally {
+      // Clear the input value so the same file can be selected again if needed
+      event.target.value = '';
+    }
+  };
+  
+  reader.readAsText(file);
+}
+
 /* ════ UTILITIES ══════════════════════════════════════════════ */
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -1030,3 +1106,4 @@ function initReminderChecker() {
     }
   }, 60000); // Check every 60 seconds
 }
+
