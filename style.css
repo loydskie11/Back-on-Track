@@ -192,15 +192,68 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .progress-toggle-wrap{flex-shrink:0}
 /* Fix: progress select arrow visible on dark background */
-.progress-select{
-  background-color:rgba(255,255,255,.15);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,.85)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 10px center;
-  border:1px solid rgba(255,255,255,.25);color:white;border-radius:var(--radius-sm);
-  padding:6px 28px 6px 10px;font-size:.8rem;font-family:var(--font);font-weight:500;
-  cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;
-  backdrop-filter:blur(8px)}
-.progress-select option{background:var(--indigo-800);color:white}
+/* ─── Dashboard Custom Select ────────────────────── */
+.progress-custom-select {
+  background-color: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  color: white; 
+  border-radius: var(--radius-sm);
+  padding: 6px 10px 6px 12px; 
+  font-size: .8rem; 
+  font-family: var(--font); 
+  font-weight: 500;
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  backdrop-filter: blur(8px);
+  user-select: none;
+}
+.progress-custom-select svg { width: 14px; height: 14px; }
+.progress-custom-menu {
+  position: absolute; 
+  top: calc(100% + 6px); 
+  right: 0; 
+  min-width: 110px;
+  background: var(--indigo-800); 
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--radius-md); 
+  box-shadow: var(--shadow-md);
+  z-index: 110; 
+  overflow: hidden;
+}
+.progress-custom-option {
+  padding: 10px 14px; 
+  font-size: .8rem; 
+  font-weight: 500; 
+  color: white;
+  cursor: pointer; 
+  transition: background .15s;
+}
+.progress-custom-option:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,.1); }
+.progress-custom-option:hover { background: rgba(255,255,255,.15); }
+
+/* ─── Search Input & Clear Button ────────────────── */
+.search-input { padding-right: 38px; } /* Prevent text from hiding behind the clear button */
+.search-clear-btn {
+  position: absolute; 
+  right: 10px; 
+  top: 50%; 
+  transform: translateY(-50%);
+  background: none; 
+  border: none; 
+  width: 24px; 
+  height: 24px;
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  color: var(--text-tertiary); 
+  cursor: pointer; 
+  transition: all .15s;
+}
+.search-clear-btn:hover { background: var(--gray-100); color: var(--text-primary); }
+.search-clear-btn svg { width: 14px; height: 14px; }
 .progress-labels{display:flex;justify-content:space-between;
   font-size:.78rem;color:rgba(255,255,255,.7);margin-bottom:8px}
 .progress-bar-track{width:100%;height:8px;background:rgba(255,255,255,.2);

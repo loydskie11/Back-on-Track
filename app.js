@@ -803,6 +803,52 @@ document.addEventListener('click', () => {
   }
 });
 
+/* ════ PROGRESS DROPDOWN ══════════════════════════════════════ */
+function toggleProgressDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('progress-menu').classList.toggle('hidden');
+}
+
+function selectProgressOpt(val, label) {
+  document.getElementById('progress-select').value = val;
+  document.getElementById('progress-label').textContent = label;
+  document.getElementById('progress-menu').classList.add('hidden');
+  updateProgressBar(val);
+}
+
+/* ════ SEARCH CLEAR FUNCTIONALITY ═════════════════════════════ */
+function handleSearch() {
+  const val = document.getElementById('search-input').value;
+  const clearBtn = document.getElementById('search-clear');
+  if (val.length > 0) {
+    clearBtn.classList.remove('hidden');
+  } else {
+    clearBtn.classList.add('hidden');
+  }
+  renderEntries();
+}
+
+function clearSearch() {
+  const input = document.getElementById('search-input');
+  input.value = '';
+  document.getElementById('search-clear').classList.add('hidden');
+  input.focus();
+  renderEntries();
+}
+
+/* ════ CLOSE MENUS ON OUTSIDE CLICK ═══════════════════════════ */
+document.addEventListener('click', () => {
+  const themeMenu = document.getElementById('theme-menu');
+  if (themeMenu && !themeMenu.classList.contains('hidden')) {
+    themeMenu.classList.add('hidden');
+  }
+  
+  const progressMenu = document.getElementById('progress-menu');
+  if (progressMenu && !progressMenu.classList.contains('hidden')) {
+    progressMenu.classList.add('hidden');
+  }
+});
+
 /* ════ UTILITIES ══════════════════════════════════════════════ */
 function showToast(msg) {
   const t = document.getElementById('toast');
