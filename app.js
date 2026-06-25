@@ -370,29 +370,34 @@ function updateProgressBar(mode) {
   const presentE  = entries.filter(e => e.status === 'present');
   const doneHrs   = presentE.reduce((s, e) => s + Number(e.hours), 0);
   
-  // Updated to 2 decimal places
+  // Fetch daily hours from settings for the projection, default to 8
+  const settings = JSON.parse(localStorage.getItem(`bot_settings_${currentUser.id}`) || '{}');
+  const dailyReq = parseFloat(settings.dailyHours) || 8;
+  
   const doneFmt   = doneHrs % 1 === 0 ? doneHrs : doneHrs.toFixed(2);
   const pct       = totalHrs > 0 ? Math.min((doneHrs / totalHrs) * 100, 100) : 0;
   const totalDays = presentE.length;
-  const estDays   = totalHrs > 0 && doneHrs > 0 ? Math.ceil(totalHrs / (doneHrs / totalDays)) : 0;
+  
+  // Use the user's defined daily requirement for the projection
+  const estDays = totalHrs > 0 ? Math.ceil(totalHrs / dailyReq) : 0;
   
   let ll, rl, pl, rql, fp;
   if (mode === 'hours') {
     const left = Math.max(totalHrs - doneHrs, 0);
-    // Updated to 2 decimal places
     ll = `${doneFmt} hrs done`; rl = `${left % 1 === 0 ? left : left.toFixed(2)} hrs left`;
     pl = `${pct.toFixed(1)}%`; rql = `of ${totalHrs} hrs required`; fp = pct;
   } else if (mode === 'days') {
     ll = `${totalDays} day${totalDays !== 1 ? 's' : ''} logged`;
+    // Projection now based on user's daily requirement
     rl = estDays > 0 ? `~${Math.max(estDays - totalDays, 0)} days left` : '—';
     pl = `${totalDays} days`;
-    // Updated to 2 decimal places
-    rql = `at avg ${totalDays > 0 ? (doneHrs / totalDays).toFixed(2) : 0} hrs/day`;
+    rql = `at ${dailyReq} hrs/day target`;
     fp  = estDays > 0 ? Math.min((totalDays / estDays) * 100, 100) : pct;
   } else {
     ll = `${pct.toFixed(1)}% complete`; rl = `${(100 - pct).toFixed(1)}% remaining`;
     pl = `${pct.toFixed(1)}%`; rql = `of ${totalHrs} hrs required`; fp = pct;
   }
+  
   document.getElementById('progress-label-left').textContent  = ll;
   document.getElementById('progress-label-right').textContent = rl;
   document.getElementById('progress-pct').textContent         = pl;
@@ -860,6 +865,7 @@ function checkProfileChanges() {
   const settings = JSON.parse(localStorage.getItem(`bot_settings_${currentUser.id}`) || '{}');
   const remToggle = document.getElementById('prof-reminder-toggle').checked;
   const remTime = document.getElementById('prof-reminder-time').value;
+  const dailyHrs = parseFloat(document.getElementById('prof-daily-hours').value) || 8;
 
   const isProfileChanged = 
     name !== profile.name || course !== profile.course ||
@@ -867,9 +873,12 @@ function checkProfileChanges() {
     supervisor !== profile.supervisor || hrs !== profile.requiredHours;
 
   const isThemeChanged = theme !== savedTheme;
-  const isRemChanged = remToggle !== (settings.reminderEnabled || false) || remTime !== (settings.reminderTime || '17:00');
+  const isSettingsChanged = 
+    remToggle !== (settings.reminderEnabled || false) || 
+    remTime !== (settings.reminderTime || '17:00') ||
+    dailyHrs !== (settings.dailyHours || 8);
 
-  if (isProfileChanged || isThemeChanged || isRemChanged) {
+  if (isProfileChanged || isThemeChanged || isSettingsChanged) {
     btn.disabled = false;
     btn.style.opacity = '1';
     btn.style.cursor = 'pointer';
@@ -883,7 +892,7 @@ function checkProfileChanges() {
 /* ════ PROFILE MODAL ══════════════════════════════════════════ */
 function openProfileModal() {
   if (!profile) return;
-  document.body.classList.add('no-scroll'); // Locks background scrolling
+  document.body.classList.add('no-scroll'); 
   
   document.getElementById('prof-name').value       = profile.name;
   document.getElementById('prof-course').value     = profile.course;
@@ -901,10 +910,10 @@ function openProfileModal() {
   const isEnabled = settings.reminderEnabled || false;
   document.getElementById('prof-reminder-toggle').checked = isEnabled;
   document.getElementById('prof-reminder-time').value = settings.reminderTime || '17:00';
+  document.getElementById('prof-daily-hours').value = settings.dailyHours || 8; // Load Daily Hours
   document.getElementById('reminder-time-row').classList.toggle('hidden', !isEnabled);
   
-  checkProfileChanges(); // Set save button to disabled initially
-  
+  checkProfileChanges(); 
   document.getElementById('profile-modal').classList.remove('hidden');
 }
 
@@ -924,14 +933,13 @@ async function saveProfile() {
   if (!name || !course || !company || !address || !supervisor || !hrs || hrs < 1) { showToast('Please fill in all fields.'); return; }
   profile = { name, course, company, address, supervisor, requiredHours: hrs };
   
-  // Save Theme
-  const selectedTheme = document.getElementById('prof-theme').value;
-  applyTheme(selectedTheme);
+  applyTheme(document.getElementById('prof-theme').value);
 
-  // Save Reminder Settings Locally
+  // Save Settings Locally (including Daily Hours)
   const settings = {
     reminderEnabled: document.getElementById('prof-reminder-toggle').checked,
-    reminderTime: document.getElementById('prof-reminder-time').value
+    reminderTime: document.getElementById('prof-reminder-time').value,
+    dailyHours: parseFloat(document.getElementById('prof-daily-hours').value) || 8
   };
   localStorage.setItem(`bot_settings_${currentUser.id}`, JSON.stringify(settings));
   
@@ -1271,12 +1279,18 @@ function initReminderChecker() {
 /* ════ EXPORT DTR (FORM 48) ═══════════════════════════════════ */
 function openDtrModal() {
   document.getElementById('dtr-format-toggle').checked = false;
-  document.getElementById('dtr-month-1').value = '';
+  
+  // Pre-fill with the current year and month
+  const now = new Date();
+  const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  document.getElementById('dtr-month-1').value = currentMonth;
+  
+  // Leave the second month blank ("----") by default
   document.getElementById('dtr-month-2').value = '';
   document.getElementById('dtr-month-2-row').classList.add('hidden');
   document.getElementById('label-month-1').textContent = 'Month';
-  validateDtrExport();
   
+  validateDtrExport();
   closeProfileModal();
   document.getElementById('dtr-modal').classList.remove('hidden');
 }
@@ -1357,12 +1371,15 @@ function buildDtrCopyHtml(monthValue) {
     dayMap[ed.getDate()] = e;
   });
 
+  // Get required daily minutes from settings (Default: 8 hours = 480 mins)
+  const userSettings = JSON.parse(localStorage.getItem(`bot_settings_${currentUser.id}`) || '{}');
+  const reqDailyMins = (parseFloat(userSettings.dailyHours) || 8) * 60;
+
   let rowsHtml = '';
-  let totalMinutes = 0; // Changed from totalHours to totalMinutes for precision
+  let totalMinutes = 0; 
   
   for (let d = 1; d <= 31; d++) {
     if (d > daysInMonth) {
-      // Blank out rows for days that don't exist in this month (e.g. Feb 30)
       rowsHtml += `<tr><td>${d}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
       continue;
     }
@@ -1374,7 +1391,6 @@ function buildDtrCopyHtml(monthValue) {
       const pmI = ent.pmIn ? formatTimePrint(ent.pmIn) : '';
       const pmO = ent.pmOut ? formatTimePrint(ent.pmOut) : '';
       
-      // Calculate exact minutes directly from timestamps for a perfect total
       let dailyMins = 0;
       let hasTimeSlots = false;
       
@@ -1392,22 +1408,34 @@ function buildDtrCopyHtml(monthValue) {
         dailyMins += Math.round((dOut - dIn) / 60000);
         hasTimeSlots = true;
       }
-      
-      // Fallback: If it's an old legacy entry with no timestamps, convert its decimal hours to minutes
       if (!hasTimeSlots && ent.hours) {
         dailyMins += Math.round(parseFloat(ent.hours) * 60);
       }
       
       totalMinutes += dailyMins;
 
-      rowsHtml += `<tr><td>${d}</td><td>${amI}</td><td>${amO}</td><td>${pmI}</td><td>${pmO}</td><td></td><td></td></tr>`;
+      // ─── UNDER TIME CALCULATION ───
+      let uH_str = '';
+      let uM_str = '';
+      
+      // Only calculate undertime if they logged time that day but fell short
+      if (dailyMins > 0 && dailyMins < reqDailyMins) {
+        const underMins = reqDailyMins - dailyMins;
+        const uH = Math.floor(underMins / 60);
+        const uM = underMins % 60;
+        
+        if (uH > 0) uH_str = uH;
+        if (uM > 0) uM_str = uM;
+        else if (uH > 0) uM_str = '00'; // Show "00" mins if it's exactly X hours of undertime
+      }
+
+      rowsHtml += `<tr><td>${d}</td><td>${amI}</td><td>${amO}</td><td>${pmI}</td><td>${pmO}</td><td>${uH_str}</td><td>${uM_str}</td></tr>`;
     } else {
-      // Empty row
       rowsHtml += `<tr><td>${d}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
     }
   }
 
-  // Format the total exact hours and minutes (e.g., "140:15 hrs")
+  // Format the total exact hours and minutes
   const tHours = Math.floor(totalMinutes / 60);
   const tMins = totalMinutes % 60;
   const totalDisplay = tMins > 0 ? `${tHours}:${String(tMins).padStart(2, '0')} hrs` : `${tHours} hrs`;
