@@ -347,10 +347,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);
 .view-panel.hidden { display: none !important; }
 
 /* remove old entries-title since it's now replaced by tabs */
-.entries-header { display: flex; flex-direction: column; gap: 10px; }
-
 /* ─── Entries Section ────────────────────────────── */
-.entries-header{display:flex;flex-direction:column;gap:10px}
+/* ─── Entries Section ────────────────────────────── */
+.entries-header { 
+  display: flex !important; 
+  flex-direction: row !important; 
+  align-items: center !important;
+  gap: 8px !important; 
+  width: 100% !important;
+}
 .entries-title{font-size:1.1rem;font-weight:700;color:var(--text-primary);letter-spacing:-.2px}
 .search-wrap{position:relative;display:flex;align-items:center}
 .search-icon{position:absolute;left:13px;width:16px;height:16px;
@@ -709,3 +714,58 @@ body.no-scroll { overflow: hidden; }
   .dtr-signature { margin-top: 25px; text-align: center; font-size: 8pt; }
   .dtr-signature-line { border-bottom: 1px solid black; width: 60%; margin: 0 auto 4px; }
 }
+
+/* ─── Filter Dropdowns ───────────────────────────── */
+.filter-dropdown-wrap { position: relative; }
+.filter-custom-select {
+  background-color: var(--white);
+  border: 1.5px solid var(--border);
+  color: var(--text-tertiary); /* Perfectly matches the search placeholder */
+  border-radius: var(--radius-md);
+  padding: 0 10px; /* Slightly tighter for mobile */
+  height: 42px; 
+  font-size: .85rem;
+  font-family: var(--font);
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  transition: all .18s;
+  width: 100%; /* Fills its flex container */
+}
+/* Truncates text with '...' if the screen gets too small */
+.filter-custom-select span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.filter-custom-select:hover { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+.filter-custom-select svg { width: 14px; height: 14px; color: var(--text-tertiary); }
+.filter-custom-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 120px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 110;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.filter-custom-option {
+  padding: 10px 14px;
+  font-size: .85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.filter-custom-option:not(:last-child) { border-bottom: 1px solid var(--gray-100); }
+.filter-custom-option:hover { background: var(--gray-50); color: var(--primary); }
+.filter-custom-option.selected { font-weight: 700; color: var(--primary); background: var(--indigo-50); }

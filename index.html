@@ -216,17 +216,52 @@
     </div>
 
     <!-- Entries Panel -->
-    <!-- Entries Panel -->
     <div id="panel-entries" class="view-panel">
       <div class="entries-header">
-        <div class="search-wrap">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input type="text" id="search-input" class="search-input" placeholder="Search entries…" oninput="handleSearch()" />
-          <button class="search-clear-btn hidden" id="search-clear" onclick="clearSearch()" title="Clear search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+        <div class="search-wrap" style="flex: 2; min-width: 0;">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="search-input" class="search-input" placeholder="Search entries…" oninput="handleSearch()" style="height: 42px;" />
+            <button class="search-clear-btn hidden" id="search-clear" onclick="clearSearch()" title="Clear search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
         </div>
-      </div>
+
+        <div class="filter-dropdown-wrap" style="flex: 0.8; min-width: 0;">
+            <input type="hidden" id="filter-status" value="all" />
+            <div class="filter-custom-select" onclick="toggleFilterDropdown('status-menu', event)">
+                <span id="filter-status-label">All Status</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="filter-custom-menu hidden" id="status-menu">
+                <div class="filter-custom-option selected" data-val="all" onclick="selectFilterOpt('status', 'all', 'All Status')">All Status</div>
+                <div class="filter-custom-option" data-val="present" onclick="selectFilterOpt('status', 'present', 'Present')">Present</div>
+                <div class="filter-custom-option" data-val="absent" onclick="selectFilterOpt('status', 'absent', 'Absent')">Absent</div>
+            </div>
+        </div>
+
+        <div class="filter-dropdown-wrap" style="flex: 0.8; min-width: 0;">
+            <input type="hidden" id="filter-month" value="all" />
+            <div class="filter-custom-select" onclick="toggleFilterDropdown('month-menu', event)">
+                <span id="filter-month-label">All Months</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="filter-custom-menu hidden" id="month-menu" style="max-height: 250px; overflow-y: auto;">
+                <div class="filter-custom-option selected" data-val="all" onclick="selectFilterOpt('month', 'all', 'All Months')">All Months</div>
+                <div class="filter-custom-option" data-val="01" onclick="selectFilterOpt('month', '01', 'Jan')">Jan</div>
+                <div class="filter-custom-option" data-val="02" onclick="selectFilterOpt('month', '02', 'Feb')">Feb</div>
+                <div class="filter-custom-option" data-val="03" onclick="selectFilterOpt('month', '03', 'Mar')">Mar</div>
+                <div class="filter-custom-option" data-val="04" onclick="selectFilterOpt('month', '04', 'Apr')">Apr</div>
+                <div class="filter-custom-option" data-val="05" onclick="selectFilterOpt('month', '05', 'May')">May</div>
+                <div class="filter-custom-option" data-val="06" onclick="selectFilterOpt('month', '06', 'Jun')">Jun</div>
+                <div class="filter-custom-option" data-val="07" onclick="selectFilterOpt('month', '07', 'Jul')">Jul</div>
+                <div class="filter-custom-option" data-val="08" onclick="selectFilterOpt('month', '08', 'Aug')">Aug</div>
+                <div class="filter-custom-option" data-val="09" onclick="selectFilterOpt('month', '09', 'Sep')">Sep</div>
+                <div class="filter-custom-option" data-val="10" onclick="selectFilterOpt('month', '10', 'Oct')">Oct</div>
+                <div class="filter-custom-option" data-val="11" onclick="selectFilterOpt('month', '11', 'Nov')">Nov</div>
+                <div class="filter-custom-option" data-val="12" onclick="selectFilterOpt('month', '12', 'Dec')">Dec</div>
+            </div>
+        </div>
+      </div> 
       <div id="entries-list" class="entries-list"></div>
     </div>
 

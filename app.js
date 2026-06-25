@@ -27,6 +27,12 @@ function applyTheme(themeName) {
   localStorage.setItem('bot_theme', themeName);
 }
 
+function populateFilterMonths() {
+  const group = document.getElementById('filter-months-group');
+  const months = [...new Set(entries.map(e => e.date.substring(0, 7)))].sort().reverse();
+  group.innerHTML = months.map(m => `<option value="${m}">${new Date(m + '-01').toLocaleDateString('en-PH', { month: 'long', year: 'numeric' })}</option>`).join('');
+}
+
 // Apply the saved theme immediately on load
 const savedTheme = localStorage.getItem('bot_theme') || 'default';
 applyTheme(savedTheme);
@@ -142,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateOfflineBanner();
         await processQueue();
         updateOfflineBanner();
+        
         if (!localStorage.getItem('bot_v3_seen')) {
           setTimeout(() => showWhatsNewModal(), 500);
         }
@@ -523,21 +530,43 @@ function closeCalModalOutside(e){ if (e.target.classList.contains('modal-overlay
 
 /* ════ ENTRIES RENDER ═══════════════════════════════════════ */
 function renderEntries() {
-  const q      = document.getElementById('search-input').value.trim().toLowerCase();
-  const list   = document.getElementById('entries-list');
-  const filtered = entries.filter(e =>
-    !q || e.details.toLowerCase().includes(q) || e.date.includes(q) ||
-    String(e.dayNumber).includes(q) || (e.status && e.status.includes(q))
-  );
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const statusFilter = document.getElementById('filter-status').value;
+  const monthFilter = document.getElementById('filter-month').value;
+  const list = document.getElementById('entries-list');
+
+  // Highlight selected options in the menus
+  document.querySelectorAll('#status-menu .filter-custom-option').forEach(opt => {
+    opt.classList.toggle('selected', opt.dataset.val === statusFilter);
+  });
+  document.querySelectorAll('#month-menu .filter-custom-option').forEach(opt => {
+    opt.classList.toggle('selected', opt.dataset.val === monthFilter);
+  });
+
+  // Apply Search AND Filter Logic
+  const filtered = entries.filter(e => {
+    // 1. Search Query Match
+    const matchSearch = !q || e.details.toLowerCase().includes(q) || e.date.includes(q) ||
+      String(e.dayNumber).includes(q) || (e.status && e.status.includes(q));
+      
+    // 2. Status Match
+    const matchStatus = statusFilter === 'all' || e.status === statusFilter;
+    
+    // 3. Month Match (Extracts "MM" from "YYYY-MM-DD")
+    const matchMonth = monthFilter === 'all' || e.date.substring(5, 7) === monthFilter;
+
+    return matchSearch && matchStatus && matchMonth;
+  });
 
   if (!filtered.length) {
+    const isFiltering = q !== '' || statusFilter !== 'all' || monthFilter !== 'all';
     list.innerHTML = `<div class="empty-state">
       <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/>
         <path d="M8 15h4M8 18h8" stroke-linecap="round"/>
       </svg>
-      <h3>${q ? 'No matching entries' : 'No entries yet'}</h3>
-      <p>${q ? 'Try a different search term.' : 'Tap the + button below to log your first DTR entry.'}</p>
+      <h3>${isFiltering ? 'No matching entries' : 'No entries yet'}</h3>
+      <p>${isFiltering ? 'Try adjusting your search or filters.' : 'Tap the + button below to log your first DTR entry.'}</p>
     </div>`; return;
   }
 
@@ -553,20 +582,14 @@ function renderEntries() {
       : `<span class="entry-hours-badge">${hrs} hrs</span>`;
     const dayNum = isAbs ? '—' : e.dayNumber;
 
-    // Truncate details
     const detailFull = e.details || '';
     const truncated  = detailFull.length > MAX_CHARS;
     const detailShow = truncated ? detailFull.slice(0, MAX_CHARS) + '…' : detailFull;
-    
-    // Removed the onclick from here since the parent card will handle it
-    const moreHint   = truncated
-      ? `<span class="entry-details-hint">Read more</span>` : '';
+    const moreHint   = truncated ? `<span class="entry-details-hint">Read more</span>` : '';
 
-    // Pending dot
     const isPending = USE_SUPABASE && getQueue().some(op =>
       (op.type === 'add' || op.type === 'edit') && op.payload?.id === e.id);
 
-    // Added onclick and cursor:pointer to the main card
     return `<div class="entry-card${isAbs ? ' absent-card' : ''}" id="card-${e.id}" onclick="openViewModal('${e.id}')" style="cursor: pointer;">
       <div class="entry-day-badge">
         <span class="entry-day-num">${dayNum}</span>
@@ -1006,6 +1029,23 @@ function selectProgressOpt(val, label) {
   updateProgressBar(val);
 }
 
+/* ════ FILTER DROPDOWNS ══════════════════════════════════════ */
+function toggleFilterDropdown(menuId, e) {
+  e.stopPropagation();
+  // Close all other filter menus first
+  document.querySelectorAll('.filter-custom-menu').forEach(m => {
+    if (m.id !== menuId) m.classList.add('hidden');
+  });
+  document.getElementById(menuId).classList.toggle('hidden');
+}
+
+function selectFilterOpt(type, val, label) {
+  document.getElementById(`filter-${type}`).value = val;
+  document.getElementById(`filter-${type}-label`).textContent = label;
+  document.getElementById(`${type}-menu`).classList.add('hidden');
+  renderEntries(); // Re-render the list immediately
+}
+
 /* ════ SEARCH CLEAR FUNCTIONALITY ═════════════════════════════ */
 function handleSearch() {
   const val = document.getElementById('search-input').value;
@@ -1037,6 +1077,8 @@ document.addEventListener('click', () => {
   if (progressMenu && !progressMenu.classList.contains('hidden')) {
     progressMenu.classList.add('hidden');
   }
+
+  document.querySelectorAll('.filter-custom-menu').forEach(m => m.classList.add('hidden'));
 });
 
 /* ════ CSV EXPORT ═════════════════════════════════════════════ */
