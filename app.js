@@ -842,9 +842,49 @@ async function confirmDelete() {
   showToast(!navigator.onLine && USE_SUPABASE ? 'Entry deleted (syncs when online)' : 'Entry deleted');
 }
 
+/* ════ CHECK PROFILE CHANGES ═════════════════════════════════ */
+function checkProfileChanges() {
+  if (!profile) return;
+  const btn = document.getElementById('btn-save-profile');
+  
+  const name = document.getElementById('prof-name').value.trim();
+  const course = document.getElementById('prof-course').value.trim();
+  const company = document.getElementById('prof-company').value.trim();
+  const address = document.getElementById('prof-address').value.trim();
+  const supervisor = document.getElementById('prof-supervisor').value.trim();
+  const hrs = parseFloat(document.getElementById('prof-hours').value) || 0;
+
+  const theme = document.getElementById('prof-theme').value;
+  const savedTheme = localStorage.getItem('bot_theme') || 'default';
+
+  const settings = JSON.parse(localStorage.getItem(`bot_settings_${currentUser.id}`) || '{}');
+  const remToggle = document.getElementById('prof-reminder-toggle').checked;
+  const remTime = document.getElementById('prof-reminder-time').value;
+
+  const isProfileChanged = 
+    name !== profile.name || course !== profile.course ||
+    company !== profile.company || address !== profile.address ||
+    supervisor !== profile.supervisor || hrs !== profile.requiredHours;
+
+  const isThemeChanged = theme !== savedTheme;
+  const isRemChanged = remToggle !== (settings.reminderEnabled || false) || remTime !== (settings.reminderTime || '17:00');
+
+  if (isProfileChanged || isThemeChanged || isRemChanged) {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  } else {
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+  }
+}
+
 /* ════ PROFILE MODAL ══════════════════════════════════════════ */
 function openProfileModal() {
   if (!profile) return;
+  document.body.classList.add('no-scroll'); // Locks background scrolling
+  
   document.getElementById('prof-name').value       = profile.name;
   document.getElementById('prof-course').value     = profile.course;
   document.getElementById('prof-company').value    = profile.company;
@@ -852,27 +892,26 @@ function openProfileModal() {
   document.getElementById('prof-supervisor').value = profile.supervisor;
   document.getElementById('prof-hours').value      = profile.requiredHours;
   
-  // Set custom theme
   const savedT = localStorage.getItem('bot_theme') || 'default';
   document.getElementById('prof-theme').value = savedT;
-  const labels = {
-    'default': 'Indigo (Default)',
-    'earthy': 'Warm Earth',
-    'high-contrast': 'Professional High-Contrast'
-  };
+  const labels = { 'default': 'Indigo (Default)', 'earthy': 'Warm Earth', 'high-contrast': 'Professional High-Contrast' };
   document.getElementById('theme-label').textContent = labels[savedT] || 'Indigo (Default)';
 
-  // Set Reminder Settings
   const settings = JSON.parse(localStorage.getItem(`bot_settings_${currentUser.id}`) || '{}');
   const isEnabled = settings.reminderEnabled || false;
   document.getElementById('prof-reminder-toggle').checked = isEnabled;
   document.getElementById('prof-reminder-time').value = settings.reminderTime || '17:00';
   document.getElementById('reminder-time-row').classList.toggle('hidden', !isEnabled);
   
+  checkProfileChanges(); // Set save button to disabled initially
+  
   document.getElementById('profile-modal').classList.remove('hidden');
 }
 
-function closeProfileModal()     { document.getElementById('profile-modal').classList.add('hidden'); }
+function closeProfileModal() { 
+  document.body.classList.remove('no-scroll'); // Unlocks background scrolling
+  document.getElementById('profile-modal').classList.add('hidden'); 
+}
 function closeProfileOutside(e)  { if (e.target.classList.contains('modal-overlay')) closeProfileModal(); }
 
 async function saveProfile() {
@@ -935,6 +974,7 @@ function selectThemeOpt(val, label) {
   document.getElementById('prof-theme').value = val;
   document.getElementById('theme-label').textContent = label;
   document.getElementById('theme-menu').classList.add('hidden');
+  checkProfileChanges();
 }
 
 // Close custom dropdown when clicking outside
@@ -1162,6 +1202,7 @@ function handleReminderToggle(e) {
     if (!('Notification' in window)) {
       showToast('Notifications not supported on this browser.');
       e.target.checked = false;
+      checkProfileChanges();
       return;
     }
     if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
@@ -1173,15 +1214,19 @@ function handleReminderToggle(e) {
         } else {
           document.getElementById('reminder-time-row').classList.remove('hidden');
         }
+        checkProfileChanges();
       });
     } else if (Notification.permission === 'denied') {
       showToast('Notifications blocked in browser settings.');
       e.target.checked = false;
+      checkProfileChanges();
     } else {
       document.getElementById('reminder-time-row').classList.remove('hidden');
+      checkProfileChanges();
     }
   } else {
     document.getElementById('reminder-time-row').classList.add('hidden');
+    checkProfileChanges();
   }
 }
 

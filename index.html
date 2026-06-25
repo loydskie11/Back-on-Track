@@ -426,7 +426,7 @@
           </div>
           <div class="settings-field">
             <label class="field-label">Full Name</label>
-            <input type="text" id="prof-name" class="settings-input" />
+            <input type="text" id="prof-name" class="settings-input" oninput="checkProfileChanges()" />
           </div>
         </div>
         <div class="settings-row">
@@ -435,7 +435,7 @@
           </div>
           <div class="settings-field">
             <label class="field-label">Course / Program</label>
-            <input type="text" id="prof-course" class="settings-input" />
+            <input type="text" id="prof-course" class="settings-input" oninput="checkProfileChanges()" />
           </div>
         </div>
       </div>
@@ -449,7 +449,7 @@
           </div>
           <div class="settings-field">
             <label class="field-label">Company Name</label>
-            <input type="text" id="prof-company" class="settings-input" />
+            <input type="text" id="prof-company" class="settings-input" oninput="checkProfileChanges()" />
           </div>
         </div>
         <div class="settings-row">
@@ -458,7 +458,7 @@
           </div>
           <div class="settings-field">
             <label class="field-label">Company Address</label>
-            <input type="text" id="prof-address" class="settings-input" />
+            <input type="text" id="prof-address" class="settings-input" oninput="checkProfileChanges()" />
           </div>
         </div>
         <div class="settings-row">
@@ -467,7 +467,7 @@
           </div>
           <div class="settings-field">
             <label class="field-label">Supervisor Name</label>
-            <input type="text" id="prof-supervisor" class="settings-input" />
+            <input type="text" id="prof-supervisor" class="settings-input" oninput="checkProfileChanges()" />
           </div>
         </div>
         <div class="settings-row">
@@ -476,7 +476,7 @@
           </div>
           <div class="settings-field">
             <label class="field-label">Total Required Hours</label>
-            <input type="number" id="prof-hours" class="settings-input" min="1" />
+            <input type="number" id="prof-hours" class="settings-input" min="1" oninput="checkProfileChanges()" />
           </div>
         </div>
       </div>
@@ -488,7 +488,6 @@
           <div class="settings-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
           </div>
-          <!-- Custom Select Container -->
           <div class="settings-field" style="position: relative;">
             <label class="field-label">App Theme</label>
             <input type="hidden" id="prof-theme" value="default" />
@@ -524,16 +523,20 @@
           <div class="settings-icon" style="background:transparent; color:transparent;"></div>
           <div class="settings-field" style="flex-direction: row; justify-content: space-between; align-items: center;">
             <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary);">Time</label>
-            <input type="time" id="prof-reminder-time" class="settings-input" style="width: auto; text-align: right;" value="17:00" />
+            <input type="time" id="prof-reminder-time" class="settings-input" style="width: auto; text-align: right;" value="17:00" onchange="checkProfileChanges()" />
           </div>
         </div>
       </div>
 
       <!-- Group 5: Export & Print -->
-      <div class="settings-section-title">Export & Print</div>
+      <div class="settings-section-title" style="display:flex; align-items:center;">
+        Export & Print
+        <div class="info-tooltip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:var(--text-tertiary);cursor:help;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span class="tooltip-text">Export your DTR directly to CSV format or a printable Civil Service Form 48 layout.</span>
+        </div>
+      </div>
       <div class="settings-group">
-        
-        <!-- Export DTR (Form 48) Row -->
         <div class="settings-row" style="cursor: pointer;" onclick="openDtrModal()">
           <div class="settings-icon" style="background: var(--indigo-100); color: var(--indigo-700);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><polyline points="6 14 12 20 18 14"/><line x1="12" y1="20" x2="12" y2="4"/></svg>
@@ -542,8 +545,6 @@
             <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary); cursor: pointer;">Export DTR (Form 48)</label>
           </div>
         </div>
-
-        <!-- Export CSV Row -->
         <div class="settings-row" style="cursor: pointer;" onclick="exportToCSV()">
           <div class="settings-icon" style="background: var(--indigo-100); color: var(--indigo-700);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -552,13 +553,17 @@
             <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary); cursor: pointer;">Export as CSV</label>
           </div>
         </div>
-
       </div>
 
       <!-- Group 6: Data Management -->
-      <div class="settings-section-title">Data Management</div>
+      <div class="settings-section-title" style="display:flex; align-items:center;">
+        Data Management
+        <div class="info-tooltip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:var(--text-tertiary);cursor:help;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span class="tooltip-text">Securely back up your app data to a JSON file, and restore it later or on another device.</span>
+        </div>
+      </div>
       <div class="settings-group">
-        
         <div class="settings-row" style="cursor: pointer;" onclick="backupData()">
           <div class="settings-icon" style="background: var(--gray-200); color: var(--gray-700);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -567,7 +572,6 @@
             <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary); cursor: pointer;">Backup Data</label>
           </div>
         </div>
-
         <div class="settings-row" style="cursor: pointer;" onclick="document.getElementById('restore-file').click()">
           <div class="settings-icon" style="background: var(--gray-200); color: var(--gray-700);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -577,14 +581,17 @@
           </div>
           <input type="file" id="restore-file" accept=".json" class="hidden" onchange="restoreData(event)" />
         </div>
-
       </div>
+      
+      <!-- Moved Sign Out Button inside the scrollable body -->
+      <button class="btn-ghost-danger full" onclick="confirmSignOut()" style="margin-top: 24px;">Sign Out</button>
 
     </div>
     
-    <div class="modal-footer" style="flex-direction:column;gap:8px;">
-      <button class="btn-primary full" onclick="saveProfile()">Save Changes</button>
-      <button class="btn-ghost-danger full" onclick="confirmSignOut()">Sign Out</button>
+    <!-- Clean side-by-side footer with dynamic save button -->
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeProfileModal()">Cancel</button>
+      <button class="btn-primary" id="btn-save-profile" onclick="saveProfile()" disabled style="opacity:0.6; cursor:not-allowed;">Save</button>
     </div>
   </div>
 </div>

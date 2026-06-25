@@ -628,6 +628,24 @@ input[type="date"]{color-scheme:light}
 /* ─── Print Media Queries (Form 48) ──────────────── */
 .print-only { display: none; }
 
+/* ─── Scroll Lock ────────────────────────────────── */
+body.no-scroll { overflow: hidden; }
+
+/* ─── Info Tooltips ──────────────────────────────── */
+.info-tooltip { position: relative; display: inline-flex; align-items: center; justify-content: center; margin-left: 6px; }
+.info-tooltip .tooltip-text {
+  visibility: hidden; width: max-content; max-width: 220px; background-color: var(--gray-800);
+  color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; font-size: 0.75rem;
+  position: absolute; z-index: 10; bottom: 135%; left: 50%; transform: translateX(-50%);
+  opacity: 0; transition: opacity 0.2s; font-weight: 500; text-transform: none; line-height: 1.4;
+  box-shadow: var(--shadow-sm); pointer-events: none; letter-spacing: normal;
+}
+.info-tooltip .tooltip-text::after {
+  content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+  border-width: 5px; border-style: solid; border-color: var(--gray-800) transparent transparent transparent;
+}
+.info-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+
 @media print {
   @page { 
     /* Setting margin to 0 completely removes the browser's default headers/footers (watermarks) */
