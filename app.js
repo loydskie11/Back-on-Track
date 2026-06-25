@@ -705,10 +705,11 @@ function openAddModal() {
   document.getElementById('entry-date').valueAsDate        = new Date();
   document.getElementById('entry-absent-date').valueAsDate = new Date();
   
-  document.getElementById('entry-am-in').value = '';
-  document.getElementById('entry-am-out').value = '';
-  document.getElementById('entry-pm-in').value = '';
-  document.getElementById('entry-pm-out').value = '';
+  // Set default hours (08:00 AM - 12:00 PM, 01:00 PM - 05:00 PM)
+  document.getElementById('entry-am-in').value = '08:00';
+  document.getElementById('entry-am-out').value = '12:00';
+  document.getElementById('entry-pm-in').value = '13:00';
+  document.getElementById('entry-pm-out').value = '17:00';
   calculateHours();
   
   setStatus('present');

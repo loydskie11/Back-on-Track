@@ -631,18 +631,15 @@
       <div class="settings-group">
         <div class="settings-row">
           <div class="settings-field" style="flex-direction: row; justify-content: space-between; align-items: center;">
-            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary);">Print 2 Copies (Side-by-Side)</label>
-            <label class="toggle-switch">
-              <input type="checkbox" id="dtr-format-toggle" onchange="handleDtrFormatToggle(event)">
-              <span class="slider"></span>
-            </label>
+            <label class="field-label" id="label-month-1" style="font-size: 0.95rem; color: var(--text-primary);">Month</label>
+            <input type="month" id="dtr-month-1" class="settings-input" style="min-width: 140px; text-align: right; appearance: auto; -webkit-appearance: auto; cursor: pointer;" onchange="validateDtrExport()" />
           </div>
         </div>
-        
-        <div class="settings-row">
+
+        <div class="settings-row hidden" id="dtr-month-2-row">
           <div class="settings-field" style="flex-direction: row; justify-content: space-between; align-items: center;">
-            <label class="field-label" id="label-month-1" style="font-size: 0.95rem; color: var(--text-primary);">Month</label>
-            <input type="month" id="dtr-month-1" class="settings-input" style="width: auto; text-align: right;" onchange="validateDtrExport()" />
+            <label class="field-label" style="font-size: 0.95rem; color: var(--text-primary);">Month 2</label>
+            <input type="month" id="dtr-month-2" class="settings-input" style="min-width: 140px; text-align: right; appearance: auto; -webkit-appearance: auto; cursor: pointer;" onchange="validateDtrExport()" />
           </div>
         </div>
 
